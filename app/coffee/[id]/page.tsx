@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import QRSection from '@/components/QRSection'
-import FlavorBars from '@/components/FlavorBars'
+import FlavorChart from '@/components/FlavorChart'
 
 export const revalidate = 60
 
@@ -83,7 +83,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
         {/* 향미 그래프 */}
         <div className="bg-white rounded-2xl border border-[#E8E8E8] p-5">
           <div className="text-[11px] font-bold text-[#AAAAAA] uppercase tracking-widest mb-4">향미 그래프</div>
-          <FlavorBars fg={fg} />
+          <FlavorChart fg={fg} />
         </div>
 
         {/* 추출 가이드 */}
