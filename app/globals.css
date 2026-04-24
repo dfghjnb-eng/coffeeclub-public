@@ -1,7 +1,6 @@
 @import "tailwindcss";
 
 :root {
-  /* ── 색상 ── */
   --c-primary: #25B872;
   --c-primary-light: #3DD68C;
   --c-primary-bg: #E8FBF2;
@@ -15,21 +14,15 @@
   --c-quote-bg: #111111;
   --c-tag-bg: #F4F1FF;
   --c-tag-text: #666666;
-
-  /* ── 텍스트 크기 ── */
   --sz-hero: 30px;
   --sz-name: 18px;
   --sz-body: 14px;
   --sz-label: 11px;
   --sz-tag: 12px;
-
-  /* ── 상자 크기 ── */
   --sz-radius: 16px;
   --sz-padding: 20px;
   --sz-gap: 16px;
   --sz-border: 1px;
-
-  /* ── 섹션 순서 ── */
   --order-info: 1;
   --order-flavor: 2;
   --order-extraction: 3;
@@ -39,31 +32,8 @@
 
 body { font-family: Arial, Helvetica, sans-serif; }
 
-/* ── 테마 클래스 ── */
-.t-page { background-color: var(--c-page-bg) !important; color: var(--c-text-1) !important; }
-.t-header { background-color: var(--c-header-bg) !important; border-color: var(--c-border) !important; }
-.t-card {
-  background-color: var(--c-card-bg) !important;
-  border-color: var(--c-border) !important;
-  border-radius: var(--sz-radius) !important;
-  padding: var(--sz-padding) !important;
-  border-width: var(--sz-border) !important;
-  border-style: solid !important;
-}
-.t-sections { display: flex; flex-direction: column; gap: var(--sz-gap); }
-.t-hero { font-size: var(--sz-hero) !important; color: var(--c-text-1) !important; }
-.t-name { font-size: var(--sz-name) !important; color: var(--c-text-1) !important; }
-.t-body { font-size: var(--sz-body) !important; color: var(--c-text-2) !important; }
-.t-label { font-size: var(--sz-label) !important; color: var(--c-text-3) !important; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 700; }
-.t-tag-flavor { font-size: var(--sz-tag) !important; background-color: var(--c-tag-bg) !important; color: var(--c-tag-text) !important; }
-.t-primary { color: var(--c-primary) !important; }
-.t-primary-light { color: var(--c-primary-light) !important; }
-.t-badge { background-color: var(--c-primary-bg) !important; color: var(--c-primary) !important; }
-.t-quote { background-color: var(--c-quote-bg) !important; }
-
-/* ── 섹션 순서 ── */
-.sec-info { order: var(--order-info); }
-.sec-flavor { order: var(--order-flavor); }
+.sec-info       { order: var(--order-info); }
+.sec-flavor     { order: var(--order-flavor); }
 .sec-extraction { order: var(--order-extraction); }
-.sec-quote { order: var(--order-quote); }
-.sec-story { order: var(--order-story); }
+.sec-quote      { order: var(--order-quote); }
+.sec-story      { order: var(--order-story); }
