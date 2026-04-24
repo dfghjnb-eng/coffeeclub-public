@@ -1,16 +1,8 @@
 'use client'
 import { useEffect, useRef } from 'react'
-import {
-  Chart,
-  LineElement,
-  PointElement,
-  LinearScale,
-  CategoryScale,
-  Filler,
-  Tooltip,
-} from 'chart.js'
+import { Chart, registerables } from 'chart.js'
 
-Chart.register(LineElement, PointElement, LinearScale, CategoryScale, Filler, Tooltip)
+Chart.register(...registerables)
 
 const LABELS: Record<string, string> = {
   acidity: '산미', sweetness: '단맛', body: '바디감',
