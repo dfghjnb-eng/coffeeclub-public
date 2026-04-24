@@ -5,6 +5,19 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+export async function getSiteSettings(): Promise<Record<string, string>> {
+  try {
+    const { data } = await supabase
+      .from('site_settings')
+      .select('settings')
+      .eq('id', 1)
+      .single()
+    return data?.settings ?? {}
+  } catch {
+    return {}
+  }
+}
+
 export type Coffee = {
   id: string
   name: string
