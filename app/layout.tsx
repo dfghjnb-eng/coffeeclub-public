@@ -8,15 +8,22 @@ export const metadata: Metadata = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const settings = await getSiteSettings()
-  const cssVars = Object.entries(settings).map(([k, v]) => `${k}:${v}`).join(';')
+  let cssVars = ''
+  try {
+    const settings = await getSiteSettings()
+    cssVars = Object.entries(settings).map(([k, v]) => `${k}:${v}`).join(';')
+  } catch {
+    cssVars = ''
+  }
 
   return (
     <html lang="ko">
       <head>
         {cssVars && <style>{`:root{${cssVars}}`}</style>}
       </head>
-      <body className="min-h-screen t-page">{children}</body>
+      <body className="min-h-screen" style={{ background: 'var(--c-page-bg)', color: 'var(--c-text-1)', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+        {children}
+      </body>
     </html>
   );
 }
