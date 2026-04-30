@@ -5,6 +5,7 @@ import Image from 'next/image'
 import QRSection from '@/components/QRSection'
 import FlavorChart from '@/components/FlavorChart'
 import ExtractionGuide from '@/components/ExtractionGuide'
+import VisitTracker from '@/components/VisitTracker'
 
 export const revalidate = 60
 
@@ -45,6 +46,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--c-page-bg)' }}>
+      <VisitTracker coffeeId={id} />
       {/* Header */}
       <header className="border-b px-6 py-4 flex items-center justify-between" style={{ background: 'var(--c-header-bg)', borderColor: 'var(--c-border)' }}>
         <div className="flex items-center gap-3">
