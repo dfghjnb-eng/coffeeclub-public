@@ -137,6 +137,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
             href={storeUrl}
             target="_blank"
             rel="noopener noreferrer"
+            className="sec-store"
             style={{
               display: 'flex',
               alignItems: 'center',

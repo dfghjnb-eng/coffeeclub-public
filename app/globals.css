@@ -28,6 +28,7 @@
   --order-extraction: 3;
   --order-quote: 4;
   --order-story: 5;
+  --order-store: 6;
 }
 
 body { font-family: Arial, Helvetica, sans-serif; }
@@ -37,3 +38,4 @@ body { font-family: Arial, Helvetica, sans-serif; }
 .sec-extraction { order: var(--order-extraction); }
 .sec-quote      { order: var(--order-quote); }
 .sec-story      { order: var(--order-story); }
+.sec-store      { order: var(--order-store); }
