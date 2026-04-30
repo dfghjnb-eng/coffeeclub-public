@@ -35,7 +35,7 @@ export default async function CatalogPage({
         <Image src="/logo.png" alt="커피기술커피클럽" width={40} height={40} className="object-contain" />
         <div>
           <div className="font-black text-[17px]" style={{ color: 'var(--c-text-1)' }}>커피기술커피클럽</div>
-          <div className="text-[11px]" style={{ color: 'var(--c-text-3)' }}>생두 정보 카탈로그</div>
+          <div className="text-[11px]" style={{ color: 'var(--c-text-3)' }}>원두 아카이브</div>
         </div>
       </header>
 
