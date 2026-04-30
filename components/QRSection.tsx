@@ -5,13 +5,13 @@ export default function QRSection({ coffeeId, coffeeName }: { coffeeId: string; 
     ? `${window.location.origin}/coffee/${coffeeId}`
     : `https://coffeeclub-public.vercel.app/coffee/${coffeeId}`
 
-  // SVG 포맷: 벡터라 5mm×5mm에서도 선명, ecc=L(최소 패턴)
+  // ecc=L: 최소 모듈 수, margin=2: 충분한 여백, SVG: 어떤 크기에도 선명
   const qrParams = new URLSearchParams({
     format: 'svg',
     ecc: 'L',
     color: '000000',
     bgcolor: 'ffffff',
-    margin: '1',
+    margin: '2',
     data: url,
   })
   const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?${qrParams}`
@@ -24,17 +24,20 @@ export default function QRSection({ coffeeId, coffeeName }: { coffeeId: string; 
   }
 
   return (
-    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={qrSrc}
         alt="QR"
-        width={88}
-        height={88}
-        style={{ border: '1px solid #E8E8E8', borderRadius: 8, background: '#fff' }}
+        width={110}
+        height={110}
+        style={{ background: '#fff', borderRadius: 4, display: 'block' }}
       />
-      <button onClick={downloadQR} className="text-[10px] font-bold hover:underline" style={{ color: 'var(--c-primary)' }}>
-        QR 저장 (SVG)
+      <button
+        onClick={downloadQR}
+        style={{ fontSize: 10, fontWeight: 700, color: 'var(--c-primary)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+      >
+        QR 저장
       </button>
     </div>
   )
