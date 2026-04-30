@@ -125,6 +125,32 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
             <p className="leading-relaxed" style={{ fontSize: 'var(--sz-body)', color: 'var(--c-text-2)' }}>{coffee.origin_story}</p>
           </div>
         )}
+
+        {/* 스마트스토어 배너 */}
+        <a
+          href="https://smartstore.naver.com/coffeegisul"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block"
+          style={{ borderRadius: 'var(--sz-radius)', overflow: 'hidden', textDecoration: 'none' }}
+        >
+          <Image
+            src="/storefront.png"
+            alt="커피기술커피클럽 스마트스토어"
+            width={640}
+            height={480}
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+          />
+          <div
+            className="flex items-center justify-center gap-2 py-3 font-black text-[14px]"
+            style={{ background: '#03C75A', color: '#fff' }}
+          >
+            <span>🛒</span>
+            <span>스마트스토어 가기</span>
+            <span style={{ opacity: 0.7 }}>→</span>
+          </div>
+        </a>
+
       </div>
     </div>
   )
