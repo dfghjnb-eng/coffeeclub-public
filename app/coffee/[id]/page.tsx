@@ -99,27 +99,59 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
         {/* 추출 가이드 */}
         <div className="sec-extraction" style={card()}>
           <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--c-text-3)' }}>추출 가이드</div>
-          <div className="mb-4">
+
+          {/* 드립 */}
+          <div className="mb-5">
             <div className="text-[12px] font-bold mb-3" style={{ color: 'var(--c-primary)' }}>드립 (Pour Over)</div>
-            <div className="grid grid-cols-2 gap-2">
-              {[['물 온도', drip.temperature], ['비율', drip.ratio], ['분쇄도', drip.grind], ['추출 시간', drip.time]].map(([k, v]) => (
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {([['물 온도', drip.temperature], ['커피:물 비율', drip.ratio], ['분쇄도', drip.grind], ['총 추출 시간', drip.time]] as [string,string][]).filter(([,v])=>v).map(([k, v]) => (
                 <div key={k} className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
                   <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>{k}</div>
-                  <div className="text-[14px] font-black" style={{ color: 'var(--c-text-1)' }}>{v || '-'}</div>
+                  <div className="text-[13px] font-black" style={{ color: 'var(--c-text-1)' }}>{v}</div>
                 </div>
               ))}
             </div>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {([['뜸 들이기', drip.bloom_time], ['뜸 물량', drip.bloom_water], ['붓기 방식', drip.pour_method], ['권장 드리퍼', drip.dripper]] as [string,string][]).filter(([,v])=>v).map(([k, v]) => (
+                <div key={k} className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>{k}</div>
+                  <div className="text-[13px] font-black" style={{ color: 'var(--c-text-1)' }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            {drip.notes && (
+              <div className="rounded-xl p-3 border" style={{ background: 'var(--c-primary-bg)', borderColor: 'var(--c-border)' }}>
+                <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>추출 팁</div>
+                <div className="text-[13px] font-bold" style={{ color: 'var(--c-text-2)' }}>{drip.notes}</div>
+              </div>
+            )}
           </div>
+
+          {/* 에스프레소 */}
           <div>
             <div className="text-[12px] font-bold mb-3" style={{ color: 'var(--c-text-2)' }}>에스프레소</div>
-            <div className="grid grid-cols-2 gap-2">
-              {[['물 온도', esp.temperature], ['도징', esp.dose], ['수율', esp.yield], ['추출 시간', esp.time]].map(([k, v]) => (
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {([['물 온도', esp.temperature], ['도징', esp.dose], ['수율', esp.yield], ['추출 비율', esp.ratio]] as [string,string][]).filter(([,v])=>v).map(([k, v]) => (
                 <div key={k} className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
                   <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>{k}</div>
-                  <div className="text-[14px] font-black" style={{ color: 'var(--c-text-1)' }}>{v || '-'}</div>
+                  <div className="text-[13px] font-black" style={{ color: 'var(--c-text-1)' }}>{v}</div>
                 </div>
               ))}
             </div>
+            <div className="grid grid-cols-2 gap-2 mb-2">
+              {([['추출 시간', esp.time], ['압력', esp.pressure], ['프리인퓨전', esp.pre_infusion]] as [string,string][]).filter(([,v])=>v).map(([k, v]) => (
+                <div key={k} className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
+                  <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>{k}</div>
+                  <div className="text-[13px] font-black" style={{ color: 'var(--c-text-1)' }}>{v}</div>
+                </div>
+              ))}
+            </div>
+            {esp.notes && (
+              <div className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
+                <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>추출 팁</div>
+                <div className="text-[13px] font-bold" style={{ color: 'var(--c-text-2)' }}>{esp.notes}</div>
+              </div>
+            )}
           </div>
         </div>
 
