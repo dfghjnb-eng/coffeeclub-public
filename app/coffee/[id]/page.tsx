@@ -131,23 +131,32 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
           href="https://smartstore.naver.com/coffeegisul"
           target="_blank"
           rel="noopener noreferrer"
-          className="block"
-          style={{ borderRadius: 'var(--sz-radius)', overflow: 'hidden', textDecoration: 'none' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            borderRadius: 'var(--sz-radius)',
+            overflow: 'hidden',
+            textDecoration: 'none',
+            background: '#03C75A',
+            marginTop: 'auto',
+          }}
         >
-          <Image
-            src="/storefront.png"
-            alt="커피기술커피클럽 스마트스토어"
-            width={640}
-            height={480}
-            style={{ width: '100%', height: 'auto', display: 'block' }}
-          />
+          <div style={{ width: '33%', flexShrink: 0 }}>
+            <Image
+              src="/storefront.png"
+              alt="커피기술커피클럽 스마트스토어"
+              width={640}
+              height={480}
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
+          </div>
           <div
-            className="flex items-center justify-center gap-2 py-3 font-black text-[14px]"
-            style={{ background: '#03C75A', color: '#fff' }}
+            className="flex flex-col items-center justify-center gap-1 font-black"
+            style={{ flex: 1, color: '#fff', padding: '16px 12px' }}
           >
-            <span>🛒</span>
-            <span>스마트스토어 가기</span>
-            <span style={{ opacity: 0.7 }}>→</span>
+            <span style={{ fontSize: 22 }}>🛒</span>
+            <span style={{ fontSize: 14 }}>스마트스토어 가기</span>
+            <span style={{ fontSize: 12, opacity: 0.75, fontWeight: 700 }}>→ 바로가기</span>
           </div>
         </a>
 
