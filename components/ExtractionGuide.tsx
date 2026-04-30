@@ -10,12 +10,34 @@ type EspGuide = {
   time?: string; pressure?: string; pre_infusion?: string; notes?: string;
 }
 
+// 작성자 앱의 ext-box와 동일한 스타일
+const extBox: React.CSSProperties = {
+  background: '#FAFAFA',
+  borderRadius: 12,
+  padding: '13px 15px',
+  border: '1px solid var(--c-border)',
+}
+const extLabel: React.CSSProperties = {
+  fontSize: 10,
+  fontWeight: 700,
+  color: 'var(--c-text-3)',
+  textTransform: 'uppercase',
+  letterSpacing: '0.8px',
+  marginBottom: 5,
+}
+const extVal: React.CSSProperties = {
+  fontSize: 15,
+  fontWeight: 800,
+  color: 'var(--c-text-1)',
+  wordBreak: 'keep-all',
+}
+
 function Cell({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
-    <div className="rounded-xl p-3 border" style={{ background: 'var(--c-page-bg)', borderColor: 'var(--c-border)' }}>
-      <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>{label}</div>
-      <div className="text-[13px] font-black" style={{ color: 'var(--c-text-1)' }}>{value}</div>
+    <div style={extBox}>
+      <div style={extLabel}>{label}</div>
+      <div style={extVal}>{value}</div>
     </div>
   )
 }
@@ -23,9 +45,9 @@ function Cell({ label, value }: { label: string; value?: string }) {
 function TipBox({ text }: { text?: string }) {
   if (!text) return null
   return (
-    <div className="rounded-xl p-3 border col-span-2" style={{ background: 'var(--c-primary-bg)', borderColor: 'var(--c-border)' }}>
-      <div className="text-[10px] font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--c-text-3)' }}>추출 팁</div>
-      <div className="text-[13px] font-bold leading-relaxed" style={{ color: 'var(--c-text-2)' }}>{text}</div>
+    <div style={{ ...extBox, background: 'var(--c-primary-bg)', gridColumn: '1 / -1' }}>
+      <div style={extLabel}>추출 팁</div>
+      <div style={{ ...extVal, fontSize: 14, fontWeight: 700, color: 'var(--c-text-2)', lineHeight: 1.6 }}>{text}</div>
     </div>
   )
 }
@@ -33,18 +55,20 @@ function TipBox({ text }: { text?: string }) {
 export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: EspGuide }) {
   const [tab, setTab] = useState<'drip' | 'esp'>('drip')
 
-  const tabBtn = (id: 'drip' | 'esp', label: string) => (
+  const pill = (id: 'drip' | 'esp', label: string) => (
     <button
+      key={id}
       onClick={() => setTab(id)}
       style={{
-        padding: '6px 16px',
-        borderRadius: 999,
-        border: 'none',
-        fontSize: 12,
+        padding: '7px 18px',
+        borderRadius: 20,
+        border: `1.5px solid ${tab === id ? 'var(--c-text-1)' : 'var(--c-border)'}`,
+        background: tab === id ? 'var(--c-text-1)' : '#FAFAFA',
+        color: tab === id ? '#fff' : 'var(--c-text-2)',
+        fontSize: 13,
         fontWeight: 700,
         cursor: 'pointer',
-        background: tab === id ? 'var(--c-text-1)' : 'transparent',
-        color: tab === id ? '#fff' : 'var(--c-text-3)',
+        fontFamily: 'inherit',
         transition: 'all 0.15s',
       }}
     >{label}</button>
@@ -52,36 +76,36 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
 
   return (
     <div>
-      {/* 탭 */}
-      <div className="flex gap-1 mb-4 p-1 rounded-full w-fit" style={{ background: 'var(--c-page-bg)' }}>
-        {tabBtn('drip', '드립 (Pour Over)')}
-        {tabBtn('esp', '에스프레소')}
+      {/* 탭 — 작성자 앱의 tab-row / tab-pill과 동일 */}
+      <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
+        {pill('drip', '드립 (Pour Over)')}
+        {pill('esp', '에스프레소')}
       </div>
 
-      {/* 드립 탭 */}
+      {/* 드립 */}
       {tab === 'drip' && (
-        <div className="grid grid-cols-2 gap-2">
-          <Cell label="물 온도"     value={drip.temperature} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <Cell label="물 온도"      value={drip.temperature} />
           <Cell label="커피:물 비율" value={drip.ratio} />
-          <Cell label="분쇄도"      value={drip.grind} />
+          <Cell label="분쇄도"       value={drip.grind} />
           <Cell label="총 추출 시간" value={drip.time} />
-          <Cell label="뜸 들이기"   value={drip.bloom_time} />
-          <Cell label="뜸 물량"     value={drip.bloom_water} />
-          <Cell label="붓기 방식"   value={drip.pour_method} />
-          <Cell label="권장 드리퍼" value={drip.dripper} />
+          <Cell label="뜸 들이기"    value={drip.bloom_time} />
+          <Cell label="뜸 물량"      value={drip.bloom_water} />
+          <Cell label="붓기 방식"    value={drip.pour_method} />
+          <Cell label="권장 드리퍼"  value={drip.dripper} />
           <TipBox text={drip.notes} />
         </div>
       )}
 
-      {/* 에스프레소 탭 */}
+      {/* 에스프레소 */}
       {tab === 'esp' && (
-        <div className="grid grid-cols-2 gap-2">
-          <Cell label="물 온도"   value={esp.temperature} />
-          <Cell label="도징"      value={esp.dose} />
-          <Cell label="수율"      value={esp.yield} />
-          <Cell label="추출 비율" value={esp.ratio} />
-          <Cell label="추출 시간" value={esp.time} />
-          <Cell label="압력"      value={esp.pressure} />
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <Cell label="물 온도"    value={esp.temperature} />
+          <Cell label="도징"       value={esp.dose} />
+          <Cell label="수율"       value={esp.yield} />
+          <Cell label="추출 비율"  value={esp.ratio} />
+          <Cell label="추출 시간"  value={esp.time} />
+          <Cell label="압력"       value={esp.pressure} />
           <Cell label="프리인퓨전" value={esp.pre_infusion} />
           <TipBox text={esp.notes} />
         </div>
