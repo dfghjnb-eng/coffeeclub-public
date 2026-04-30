@@ -31,6 +31,7 @@ export type Coffee = {
   literary_quote: { text: string; author: string; source: string }
   extraction_guide: {
     drip: {
+      coffee_amount?: string; water_amount?: string
       temperature?: string; ratio?: string; grind?: string; time?: string
       bloom_time?: string; bloom_water?: string; pour_method?: string; dripper?: string; notes?: string
     }

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 
 type DripGuide = {
+  coffee_amount?: string; water_amount?: string;
   temperature?: string; ratio?: string; grind?: string; time?: string;
   bloom_time?: string; bloom_water?: string; pour_method?: string; dripper?: string; notes?: string;
 }
@@ -85,6 +86,8 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
       {/* 드립 */}
       {tab === 'drip' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+          <Cell label="원두양"       value={drip.coffee_amount} />
+          <Cell label="물양"         value={drip.water_amount} />
           <Cell label="물 온도"      value={drip.temperature} />
           <Cell label="커피:물 비율" value={drip.ratio} />
           <Cell label="분쇄도"       value={drip.grind} />
