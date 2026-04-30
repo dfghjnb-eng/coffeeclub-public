@@ -5,21 +5,14 @@ export default function QRSection({ coffeeId, coffeeName }: { coffeeId: string; 
     ? `${window.location.origin}/coffee/${coffeeId}`
     : `https://coffeeclub-public.vercel.app/coffee/${coffeeId}`
 
-  // ecc=L: 최소 모듈 수, margin=2: 충분한 여백, SVG: 어떤 크기에도 선명
-  const qrParams = new URLSearchParams({
-    format: 'svg',
-    ecc: 'L',
-    color: '000000',
-    bgcolor: 'ffffff',
-    margin: '2',
-    data: url,
-  })
-  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?${qrParams}`
+  const base = new URLSearchParams({ ecc: 'L', color: '000000', bgcolor: 'ffffff', margin: '2', data: url })
+  const qrSrc = `https://api.qrserver.com/v1/create-qr-code/?format=svg&${base}`        // 화면용 SVG
+  const qrPng = `https://api.qrserver.com/v1/create-qr-code/?size=600x600&${base}`      // 다운로드용 PNG
 
   function downloadQR() {
     const a = document.createElement('a')
-    a.href = qrSrc
-    a.download = `${coffeeName}_QR.svg`
+    a.href = qrPng
+    a.download = `${coffeeName}_QR.png`
     a.click()
   }
 
