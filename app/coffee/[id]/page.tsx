@@ -1,4 +1,4 @@
-import { supabase, Coffee } from '@/lib/supabase'
+import { supabase, Coffee, getSiteSettings } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -30,8 +30,13 @@ const card = (extra?: string) => ({
 
 export default async function CoffeePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const coffee = await getCoffee(id)
+  const [coffee, settings] = await Promise.all([getCoffee(id), getSiteSettings()])
   if (!coffee) notFound()
+
+  const storeUrl   = settings['store_url'] || ''
+  const storeLabel = settings['store_label'] || '스마트스토어 가기'
+  const storeBg    = settings['store_color'] || '#03C75A'
+  const storeText  = settings['store_text_color'] || '#ffffff'
 
   const drip = coffee.extraction_guide?.drip || {}
   const esp = coffee.extraction_guide?.espresso || {}
@@ -126,39 +131,30 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
           </div>
         )}
 
-        {/* 스마트스토어 배너 */}
-        <a
-          href="https://smartstore.naver.com/coffeegisul"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            borderRadius: 'var(--sz-radius)',
-            overflow: 'hidden',
-            textDecoration: 'none',
-            background: '#03C75A',
-            marginTop: 'auto',
-          }}
-        >
-          <div style={{ width: '33%', flexShrink: 0 }}>
-            <Image
-              src="/storefront.png"
-              alt="커피기술커피클럽 스마트스토어"
-              width={640}
-              height={480}
-              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            />
-          </div>
-          <div
-            className="flex flex-col items-center justify-center gap-1 font-black"
-            style={{ flex: 1, color: '#fff', padding: '16px 12px' }}
+        {/* 스토어 버튼 (소비자 설정에서 URL 지정 시에만 표시) */}
+        {storeUrl && (
+          <a
+            href={storeUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              padding: '16px',
+              borderRadius: 'var(--sz-radius)',
+              textDecoration: 'none',
+              background: storeBg,
+              color: storeText,
+              fontSize: 15,
+              fontWeight: 800,
+            }}
           >
-            <span style={{ fontSize: 22 }}>🛒</span>
-            <span style={{ fontSize: 14 }}>스마트스토어 가기</span>
-            <span style={{ fontSize: 12, opacity: 0.75, fontWeight: 700 }}>→ 바로가기</span>
-          </div>
-        </a>
+            <span>{storeLabel}</span>
+            <span style={{ opacity: 0.75 }}>→</span>
+          </a>
+        )}
 
       </div>
     </div>
