@@ -115,12 +115,19 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
           <div className="rounded-2xl p-7 relative overflow-hidden sec-quote" style={{ background: 'var(--c-quote-bg)' }}>
             <div className="absolute top-[-20px] left-4 text-[140px] font-black leading-none font-serif" style={{ color: 'rgba(61,214,140,0.1)' }}>"</div>
             <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>문학 속 한 구절</div>
-            <p className="text-white text-[16px] italic leading-relaxed mb-4 relative">"{quote.text}"</p>
+            {/* 영문 원문 */}
+            <p className="text-white text-[16px] italic leading-relaxed mb-2 relative">"{quote.text}"</p>
+            {/* 한글 번역 */}
+            {quote.translation && (
+              <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{quote.translation}</p>
+            )}
             <div className="flex justify-end items-center gap-2 text-[12px] font-bold" style={{ color: 'var(--c-primary)' }}>
               <div className="w-1 h-1 rounded-full" style={{ background: 'var(--c-primary)' }} />
               <span>{quote.author}</span>
-              <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>
-              <span className="italic">{quote.source}</span>
+              {quote.source && <>
+                <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>
+                <span className="italic">{quote.source}</span>
+              </>}
             </div>
           </div>
         )}

@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 type DripGuide = {
   coffee_amount?: string; water_amount?: string;
@@ -11,7 +11,6 @@ type EspGuide = {
   time?: string; pressure?: string; pre_infusion?: string; notes?: string;
 }
 
-// 작성자 앱의 ext-box와 동일한 스타일
 const extBox: React.CSSProperties = {
   background: '#FAFAFA',
   borderRadius: 12,
@@ -53,13 +52,107 @@ function TipBox({ text }: { text?: string }) {
   )
 }
 
+function Stopwatch() {
+  const [ms, setMs] = useState(0)
+  const [running, setRunning] = useState(false)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const start = useCallback(() => {
+    if (running) return
+    setRunning(true)
+    const startTime = Date.now() - ms
+    intervalRef.current = setInterval(() => {
+      setMs(Date.now() - startTime)
+    }, 50)
+  }, [running, ms])
+
+  const pause = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    setRunning(false)
+  }, [])
+
+  const reset = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    setRunning(false)
+    setMs(0)
+  }, [])
+
+  useEffect(() => () => { if (intervalRef.current) clearInterval(intervalRef.current) }, [])
+
+  const minutes = Math.floor(ms / 60000)
+  const seconds = Math.floor((ms % 60000) / 1000)
+  const centis  = Math.floor((ms % 1000) / 10)
+  const display = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}.${String(centis).padStart(2, '0')}`
+
+  const btnBase: React.CSSProperties = {
+    flex: 1,
+    padding: '12px 8px',
+    borderRadius: 12,
+    border: 'none',
+    fontSize: 14,
+    fontWeight: 800,
+    cursor: 'pointer',
+    fontFamily: 'inherit',
+    transition: 'opacity 0.15s',
+  }
+
+  return (
+    <div style={{
+      marginTop: 16,
+      padding: '20px',
+      background: '#FAFAFA',
+      borderRadius: 16,
+      border: '1px solid var(--c-border)',
+    }}>
+      <div style={{ ...extLabel, marginBottom: 12 }}>추출 타이머</div>
+
+      {/* 시간 표시 */}
+      <div style={{
+        textAlign: 'center',
+        fontSize: 44,
+        fontWeight: 900,
+        letterSpacing: '0.04em',
+        fontVariantNumeric: 'tabular-nums',
+        color: running ? 'var(--c-primary)' : 'var(--c-text-1)',
+        marginBottom: 16,
+        transition: 'color 0.2s',
+      }}>
+        {display}
+      </div>
+
+      {/* 버튼 */}
+      <div style={{ display: 'flex', gap: 8 }}>
+        {!running ? (
+          <button onClick={start} style={{ ...btnBase, background: 'var(--c-text-1)', color: '#fff' }}>
+            {ms === 0 ? '시작' : '계속'}
+          </button>
+        ) : (
+          <button onClick={pause} style={{ ...btnBase, background: '#F0F0F0', color: 'var(--c-text-2)' }}>
+            일시정지
+          </button>
+        )}
+        <button
+          onClick={reset}
+          style={{ ...btnBase, flex: 0.5, background: '#F0F0F0', color: 'var(--c-text-3)' }}
+        >
+          초기화
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: EspGuide }) {
   const [tab, setTab] = useState<'drip' | 'esp'>('drip')
+
+  const switchTab = (id: 'drip' | 'esp') => {
+    setTab(id)
+  }
 
   const pill = (id: 'drip' | 'esp', label: string) => (
     <button
       key={id}
-      onClick={() => setTab(id)}
+      onClick={() => switchTab(id)}
       style={{
         padding: '7px 18px',
         borderRadius: 20,
@@ -77,13 +170,11 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
 
   return (
     <div>
-      {/* 탭 — 작성자 앱의 tab-row / tab-pill과 동일 */}
       <div style={{ display: 'flex', gap: 6, marginBottom: 16 }}>
         {pill('drip', '드립 (Pour Over)')}
         {pill('esp', '에스프레소')}
       </div>
 
-      {/* 드립 */}
       {tab === 'drip' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Cell label="원두양"       value={drip.coffee_amount} />
@@ -100,7 +191,6 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
         </div>
       )}
 
-      {/* 에스프레소 */}
       {tab === 'esp' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
           <Cell label="물 온도"    value={esp.temperature} />
@@ -113,6 +203,9 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
           <TipBox text={esp.notes} />
         </div>
       )}
+
+      {/* 타이머 — 탭 전환 시 key가 바뀌어 자동 초기화 */}
+      <Stopwatch key={tab} />
     </div>
   )
 }

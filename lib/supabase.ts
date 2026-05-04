@@ -28,7 +28,7 @@ export type Coffee = {
   flavor_notes: string
   flavor_graph: Record<string, number>
   origin_story: string
-  literary_quote: { text: string; author: string; source: string }
+  literary_quote: { text: string; author: string; source: string; translation?: string }
   extraction_guide: {
     drip: {
       coffee_amount?: string; water_amount?: string
