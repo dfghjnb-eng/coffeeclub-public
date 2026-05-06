@@ -3,9 +3,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import QRSection from '@/components/QRSection'
-import FlavorChart from '@/components/FlavorChart'
-import ExtractionGuide from '@/components/ExtractionGuide'
 import VisitTracker from '@/components/VisitTracker'
+import DetailTabs from '@/components/DetailTabs'
 
 export const revalidate = 60
 
@@ -19,16 +18,6 @@ async function getCoffee(id: string): Promise<Coffee | null> {
   return data
 }
 
-const card = (extra?: string) => ({
-  background: 'var(--c-card-bg)',
-  borderColor: 'var(--c-border)',
-  borderRadius: 'var(--sz-radius)',
-  padding: 'var(--sz-padding)',
-  borderWidth: 'var(--sz-border)',
-  borderStyle: 'solid',
-  ...(extra ? {} : {}),
-} as React.CSSProperties)
-
 export default async function CoffeePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [coffee, settings] = await Promise.all([getCoffee(id), getSiteSettings()])
@@ -39,133 +28,98 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
   const storeBg    = settings['store_color'] || '#03C75A'
   const storeText  = settings['store_text_color'] || '#ffffff'
 
-  const drip = coffee.extraction_guide?.drip || {}
-  const esp = coffee.extraction_guide?.espresso || {}
-  const quote = coffee.literary_quote || {}
-  const fg = coffee.flavor_graph || {}
-
   return (
-    <div className="min-h-screen" style={{ background: 'var(--c-page-bg)' }}>
+    <div className="min-h-screen" style={{ background: 'var(--p-bg)' }}>
       <VisitTracker coffeeId={id} />
-      {/* Header */}
-      <header className="border-b px-6 py-4 flex items-center justify-between" style={{ background: 'var(--c-header-bg)', borderColor: 'var(--c-border)' }}>
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="커피기술커피클럽" width={36} height={36} className="object-contain" />
-          <div className="font-black text-[16px]" style={{ color: 'var(--c-text-1)' }}>커피기술커피클럽</div>
+
+      {/* 헤더 */}
+      <header style={{
+        padding: '18px 20px 14px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        background: 'var(--p-bg)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div className="neu-sm" style={{
+            width: 44, height: 44, borderRadius: 14,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            flexShrink: 0,
+          }}>
+            <Image src="/logo.png" alt="커피기술커피클럽" width={30} height={30} className="object-contain" />
+          </div>
+          <div>
+            <div className="serif" style={{ fontSize: 17, fontWeight: 600, color: 'var(--p-ink)', lineHeight: 1, letterSpacing: -0.3 }}>
+              커기커피클럽
+            </div>
+            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginTop: 3, fontWeight: 500 }}>
+              커피기술 아카이브 · COFFEE ARCHIVE
+            </div>
+          </div>
         </div>
-        <Link href="/" className="text-[13px] font-bold hover:opacity-70" style={{ color: 'var(--c-text-2)' }}>← 목록</Link>
+        <Link href="/" style={{
+          textDecoration: 'none',
+          fontSize: 12, fontWeight: 600, color: 'var(--p-muted)',
+        }}>← 목록</Link>
       </header>
 
-      <div className="max-w-2xl mx-auto px-4 py-8 flex flex-col" style={{ gap: 'var(--sz-gap)' }}>
-        {/* Hero */}
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="font-black leading-tight" style={{ fontSize: 'var(--sz-hero)', color: 'var(--c-text-1)' }}>{coffee.name}</h1>
-            <span className="inline-block mt-2 text-[12px] font-bold px-3 py-1 rounded-full" style={{ background: 'var(--c-primary-bg)', color: 'var(--c-primary)' }}>
-              {coffee.origin}
-            </span>
-          </div>
-          <QRSection coffeeId={id} coffeeName={coffee.name} />
-        </div>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '8px 20px 48px' }}>
 
-        {/* 기본 정보 */}
-        <div className="sec-info" style={card()}>
-          <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--c-text-3)' }}>기본 정보</div>
-          <div className="divide-y" style={{ borderColor: 'var(--c-border)' }}>
-            {[
-              ['원산지', coffee.origin],
-              ['가공방식', coffee.processing],
-              ['고도', coffee.altitude],
-              ['품종', coffee.variety],
-            ].map(([k, v]) => v && (
-              <div key={k} className="flex py-3 gap-4">
-                <span className="text-[12px] font-bold w-16 flex-shrink-0 pt-0.5" style={{ color: 'var(--c-text-3)' }}>{k}</span>
-                <span className="text-[14px] font-bold" style={{ color: 'var(--c-text-1)' }}>{v}</span>
+        {/* 타이틀 카드 */}
+        <div className="neu" style={{
+          borderRadius: 28, padding: '22px', marginBottom: 20,
+          position: 'relative', overflow: 'hidden',
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              {/* 원산지 배지 */}
+              <div style={{
+                display: 'inline-block',
+                fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5,
+                marginBottom: 10, fontWeight: 500,
+              }}>
+                {coffee.origin?.toUpperCase()}
               </div>
-            ))}
+              <h1 className="serif" style={{
+                fontSize: 28, fontWeight: 500, color: 'var(--p-ink)',
+                lineHeight: 1.15, letterSpacing: -0.5, margin: 0,
+              }}>
+                {coffee.name}
+              </h1>
+              {coffee.processing && (
+                <div style={{ fontSize: 12, color: 'var(--p-muted)', marginTop: 6 }}>
+                  {coffee.processing}
+                </div>
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
+              <QRSection coffeeId={id} coffeeName={coffee.name} />
+            </div>
           </div>
+
+          {/* 맛 노트 태그 */}
           {coffee.flavor_notes && (
-            <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--c-border)' }}>
-              <div className="text-[11px] font-bold uppercase tracking-widest mb-3" style={{ color: 'var(--c-text-3)' }}>맛 노트</div>
-              <div className="flex flex-wrap gap-2">
-                {coffee.flavor_notes.split(',').map((t: string) => (
-                  <span key={t} className="font-bold px-3 py-1 rounded-full" style={{ fontSize: 'var(--sz-tag)', background: 'var(--c-primary-bg)', color: 'var(--c-primary)' }}>
-                    {t.trim()}
-                  </span>
-                ))}
-              </div>
+            <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+              {coffee.flavor_notes.split(',').map((t: string) => (
+                <div key={t} className="neu-sm" style={{
+                  padding: '5px 12px', borderRadius: 12,
+                  fontSize: 10, fontWeight: 500, color: 'var(--p-text)',
+                }}>
+                  {t.trim()}
+                </div>
+              ))}
             </div>
           )}
         </div>
 
-        {/* 향미 그래프 */}
-        <div className="sec-flavor" style={card()}>
-          <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--c-text-3)' }}>향미 그래프</div>
-          <FlavorChart fg={fg} />
-        </div>
-
-        {/* 추출 가이드 */}
-        <div className="sec-extraction" style={card()}>
-          <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--c-text-3)' }}>추출 가이드</div>
-          <ExtractionGuide drip={drip} esp={esp} />
-        </div>
-
-        {/* 문학 인용구 */}
-        {quote.text && (
-          <div className="rounded-2xl p-7 relative overflow-hidden sec-quote" style={{ background: 'var(--c-quote-bg)' }}>
-            <div className="absolute top-[-20px] left-4 text-[140px] font-black leading-none font-serif" style={{ color: 'rgba(61,214,140,0.1)' }}>"</div>
-            <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'rgba(255,255,255,0.35)' }}>문학 속 한 구절</div>
-            {/* 영문 원문 */}
-            <p className="text-white text-[16px] italic leading-relaxed mb-2 relative">"{quote.text}"</p>
-            {/* 한글 번역 */}
-            {quote.translation && (
-              <p className="text-[13px] leading-relaxed mb-4" style={{ color: 'rgba(255,255,255,0.5)' }}>{quote.translation}</p>
-            )}
-            <div className="flex justify-end items-center gap-2 text-[12px] font-bold" style={{ color: 'var(--c-primary)' }}>
-              <div className="w-1 h-1 rounded-full" style={{ background: 'var(--c-primary)' }} />
-              <span>{quote.author}</span>
-              {quote.source && <>
-                <span style={{ color: 'rgba(255,255,255,0.2)' }}>/</span>
-                <span className="italic">{quote.source}</span>
-              </>}
-            </div>
-          </div>
-        )}
-
-        {/* 원산지 이야기 */}
-        {coffee.origin_story && (
-          <div className="sec-story" style={card()}>
-            <div className="text-[11px] font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--c-text-3)' }}>원산지 이야기</div>
-            <p className="leading-relaxed" style={{ fontSize: 'var(--sz-body)', color: 'var(--c-text-2)' }}>{coffee.origin_story}</p>
-          </div>
-        )}
-
-        {/* 스토어 버튼 (소비자 설정에서 URL 지정 시에만 표시) */}
-        {storeUrl && (
-          <a
-            href={storeUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="sec-store"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-              padding: '16px',
-              borderRadius: 'var(--sz-radius)',
-              textDecoration: 'none',
-              background: storeBg,
-              color: storeText,
-              fontSize: 15,
-              fontWeight: 800,
-            }}
-          >
-            <span>{storeLabel}</span>
-            <span style={{ opacity: 0.75 }}>→</span>
-          </a>
-        )}
-
+        {/* INFO / BREW / STORY 탭 */}
+        <DetailTabs
+          coffee={coffee}
+          storeUrl={storeUrl}
+          storeLabel={storeLabel}
+          storeBg={storeBg}
+          storeText={storeText}
+        />
       </div>
     </div>
   )

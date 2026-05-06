@@ -13,18 +13,54 @@ export default function CatalogSearch({ defaultValue }: { defaultValue: string }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <input
-        type="text"
-        value={value}
-        onChange={e => setValue(e.target.value)}
-        placeholder="원두 이름, 원산지, 맛 노트 검색..."
-        className="flex-1 px-4 py-3 rounded-xl border border-[#E8E8E8] bg-white text-[14px] font-medium outline-none focus:border-[#111] transition-colors"
-      />
-      <button
-        type="submit"
-        className="px-5 py-3 bg-[#111] text-white rounded-xl font-bold text-[14px]"
-      >
+    <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 10, marginBottom: 24 }}>
+      <div className="neu-inset" style={{
+        flex: 1,
+        borderRadius: 24,
+        padding: '14px 18px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        {/* 검색 아이콘 */}
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+          stroke="#888578" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="6.5"/>
+          <path d="M16 16l4 4"/>
+        </svg>
+        <input
+          type="text"
+          value={value}
+          onChange={e => setValue(e.target.value)}
+          placeholder="원두명 / 원산지 / 맛 노트"
+          style={{
+            flex: 1,
+            background: 'transparent',
+            border: 'none',
+            outline: 'none',
+            fontFamily: 'Inter, sans-serif',
+            fontSize: 14,
+            color: '#1A1A1A',
+          }}
+        />
+        {value && (
+          <button type="button" onClick={() => { setValue(''); router.push('/') }}
+            style={{ background: 'transparent', border: 'none', cursor: 'pointer',
+              color: '#888578', fontSize: 12, fontFamily: 'Inter', padding: 0 }}>
+            지우기
+          </button>
+        )}
+      </div>
+      <button type="submit" className="neu-sm" style={{
+        borderRadius: 24,
+        padding: '0 20px',
+        fontSize: 13,
+        fontWeight: 700,
+        color: '#1A1A1A',
+        fontFamily: 'Inter',
+        border: 'none',
+        cursor: 'pointer',
+      }}>
         검색
       </button>
     </form>

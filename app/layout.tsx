@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ko">
-      <body className="min-h-screen" style={{ background: 'var(--c-page-bg)', color: 'var(--c-text-1)', fontFamily: 'Arial, Helvetica, sans-serif' }}>
+      <body className="min-h-screen no-scroll" style={{ background: 'var(--p-bg)', color: 'var(--p-ink)', fontFamily: "'Inter', sans-serif" }}>
         <ThemeApplier />
         {children}
       </body>

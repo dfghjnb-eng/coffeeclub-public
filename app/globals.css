@@ -1,28 +1,41 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=Inter:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  --c-primary: #25B872;
-  --c-primary-light: #3DD68C;
-  --c-primary-bg: #E8FBF2;
-  --c-page-bg: #F4F1FF;
-  --c-card-bg: #ffffff;
-  --c-header-bg: #ffffff;
-  --c-text-1: #111111;
-  --c-text-2: #666666;
-  --c-text-3: #AAAAAA;
-  --c-border: #E8E8E8;
-  --c-quote-bg: #111111;
-  --c-tag-bg: #F4F1FF;
-  --c-tag-text: #666666;
-  --sz-hero: 30px;
+  /* ── 뉴모피즘 팔레트 ── */
+  --p-bg:     #EDEAE3;
+  --p-bg-alt: #F2EFE8;
+  --p-ink:    #1A1A1A;
+  --p-text:   #2B2B2B;
+  --p-muted:  #888578;
+  --p-dim:    #B0AC9E;
+  --p-accent: #FF7F40;
+
+  /* ── 기존 테마 변수 (ThemeApplier 호환) ── */
+  --c-primary: #FF7F40;
+  --c-primary-light: #FF9D6C;
+  --c-primary-bg: #FFF0E8;
+  --c-page-bg: #EDEAE3;
+  --c-card-bg: #EDEAE3;
+  --c-header-bg: #EDEAE3;
+  --c-text-1: #1A1A1A;
+  --c-text-2: #2B2B2B;
+  --c-text-3: #888578;
+  --c-border: rgba(180,175,160,0.3);
+  --c-quote-bg: #1A1A1A;
+  --c-tag-bg: #F2EFE8;
+  --c-tag-text: #2B2B2B;
+  --sz-hero: 28px;
   --sz-name: 18px;
   --sz-body: 14px;
   --sz-label: 11px;
-  --sz-tag: 12px;
-  --sz-radius: 16px;
+  --sz-tag: 11px;
+  --sz-radius: 24px;
   --sz-padding: 20px;
-  --sz-gap: 16px;
-  --sz-border: 1px;
+  --sz-gap: 14px;
+  --sz-border: 0px;
+
+  /* ── 섹션 순서 ── */
   --order-info: 1;
   --order-flavor: 2;
   --order-extraction: 3;
@@ -31,8 +44,51 @@
   --order-store: 6;
 }
 
-body { font-family: Arial, Helvetica, sans-serif; }
+* { box-sizing: border-box; }
 
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--p-bg);
+  color: var(--p-ink);
+}
+
+.serif { font-family: 'Fraunces', serif; }
+
+/* ── 뉴모피즘 shadows ── */
+.neu {
+  background: var(--p-bg);
+  box-shadow:
+    8px 8px 18px rgba(180,175,160,0.45),
+    -6px -6px 16px rgba(255,255,255,0.85);
+}
+.neu-sm {
+  background: var(--p-bg);
+  box-shadow:
+    4px 4px 10px rgba(180,175,160,0.35),
+    -3px -3px 8px rgba(255,255,255,0.85);
+}
+.neu-inset {
+  background: var(--p-bg);
+  box-shadow:
+    inset 4px 4px 8px rgba(180,175,160,0.45),
+    inset -3px -3px 6px rgba(255,255,255,0.85);
+}
+.neu-pill {
+  background: linear-gradient(145deg, #F2EFE8, #E5E2DB);
+  box-shadow:
+    6px 6px 14px rgba(180,175,160,0.4),
+    -5px -5px 12px rgba(255,255,255,0.85);
+}
+
+.no-scroll::-webkit-scrollbar { display: none; }
+.no-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* 섹션 순서 (상세 페이지) */
 .sec-info       { order: var(--order-info); }
 .sec-flavor     { order: var(--order-flavor); }
 .sec-extraction { order: var(--order-extraction); }
