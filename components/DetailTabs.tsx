@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import FlavorSlider from './FlavorSlider'
 import ExtractionGuide from './ExtractionGuide'
 import type { Coffee } from '@/lib/supabase'
@@ -137,6 +138,29 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {tab === 'brew' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <ExtractionGuide drip={drip} esp={esp} />
+          {/* 추출 시작하기 → 단계별 타이머로 이동 */}
+          <Link href={`/timer/${coffee.id}`} style={{ textDecoration: 'none' }}>
+            <div style={{
+              background: 'var(--p-ink)', borderRadius: 30,
+              padding: '16px 12px 16px 22px',
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              boxShadow: '4px 6px 14px rgba(0,0,0,0.2)',
+            }}>
+              <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: '#fff' }}>
+                추출 시작하기
+              </div>
+              <div style={{
+                width: 42, height: 42, borderRadius: 21,
+                background: 'rgba(255,255,255,0.15)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+                  stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </div>
+            </div>
+          </Link>
         </div>
       )}
 
