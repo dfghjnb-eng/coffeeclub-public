@@ -1,7 +1,6 @@
 import { supabase, Coffee, getSiteSettings } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import QRSection from '@/components/QRSection'
 import VisitTracker from '@/components/VisitTracker'
 import DetailTabs from '@/components/DetailTabs'
@@ -18,82 +17,89 @@ async function getCoffee(id: string): Promise<Coffee | null> {
   return data
 }
 
+/* 원산지 이모지 */
+function OriginFlag({ origin }: { origin: string }) {
+  if (origin.includes('브라질'))    return <>🇧🇷</>
+  if (origin.includes('에티오피아')) return <>🇪🇹</>
+  if (origin.includes('케냐'))      return <>🇰🇪</>
+  if (origin.includes('콜롬비아'))  return <>🇨🇴</>
+  if (origin.includes('온두라스'))  return <>🇭🇳</>
+  if (origin.includes('과테말라'))  return <>🇬🇹</>
+  if (origin.includes('인도네시아')) return <>🇮🇩</>
+  if (origin.includes('파나마'))    return <>🇵🇦</>
+  if (origin.includes('코스타리카')) return <>🇨🇷</>
+  if (origin.includes('예멘'))      return <>🇾🇪</>
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888578" strokeWidth="1.6" strokeLinecap="round">
+      <ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(-25 12 12)"/>
+      <path d="M9 5.5C9 9.5 14 13.5 15 18.5" transform="rotate(-25 12 12)"/>
+    </svg>
+  )
+}
+
 export default async function CoffeePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [coffee, settings] = await Promise.all([getCoffee(id), getSiteSettings()])
   if (!coffee) notFound()
 
-  const storeUrl   = settings['store_url'] || ''
-  const storeLabel = settings['store_label'] || '스마트스토어 가기'
-  const storeBg    = settings['store_color'] || '#03C75A'
+  const storeUrl   = settings['store_url']        || ''
+  const storeLabel = settings['store_label']      || '스마트스토어 가기'
+  const storeBg    = settings['store_color']      || '#03C75A'
   const storeText  = settings['store_text_color'] || '#ffffff'
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--p-bg)' }}>
       <VisitTracker coffeeId={id} />
 
-      {/* 헤더 */}
-      <header style={{
-        padding: '18px 20px 14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'var(--p-bg)',
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div className="neu-sm" style={{
-            width: 44, height: 44, borderRadius: 14,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            flexShrink: 0,
-          }}>
-            <Image src="/logo.png" alt="커피기술커피클럽" width={30} height={30} className="object-contain" />
-          </div>
-          <div>
-            <div className="serif" style={{ fontSize: 17, fontWeight: 600, color: 'var(--p-ink)', lineHeight: 1, letterSpacing: -0.3 }}>
-              커기커피클럽
-            </div>
-            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginTop: 3, fontWeight: 500 }}>
-              커피기술 아카이브 · COFFEE ARCHIVE
-            </div>
-          </div>
-        </div>
-        <Link href="/" style={{
-          textDecoration: 'none',
-          fontSize: 12, fontWeight: 600, color: 'var(--p-muted)',
-        }}>← 목록</Link>
-      </header>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 60px' }}>
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '8px 20px 48px' }}>
-
-        {/* 타이틀 카드 */}
-        <div className="neu" style={{
-          borderRadius: 28, padding: '22px', marginBottom: 20,
-          position: 'relative', overflow: 'hidden',
+        {/* ── 상단 버튼 행 ── */}
+        <div style={{
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: '18px 0 16px',
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
+          <Link href="/" style={{ textDecoration: 'none' }}>
+            <div className="neu-sm" style={{
+              width: 42, height: 42, borderRadius: 21,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M19 12H5M11 18l-6-6 6-6"/>
+              </svg>
+            </div>
+          </Link>
+          <QRSection coffeeId={id} coffeeName={coffee.name} />
+        </div>
+
+        {/* ── Hero 카드 ── */}
+        <div className="neu" style={{ borderRadius: 28, padding: '20px', marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
+            {/* 원산지 국기 박스 */}
+            <div className="neu-sm" style={{
+              width: 80, height: 80, borderRadius: 22, flexShrink: 0,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontSize: 40,
+            }}>
+              <OriginFlag origin={coffee.origin ?? ''} />
+            </div>
             <div style={{ flex: 1, minWidth: 0 }}>
-              {/* 원산지 배지 */}
               <div style={{
-                display: 'inline-block',
                 fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5,
-                marginBottom: 10, fontWeight: 500,
+                marginBottom: 6, fontFamily: 'Inter, sans-serif', fontWeight: 600,
               }}>
                 {coffee.origin?.toUpperCase()}
               </div>
               <h1 className="serif" style={{
-                fontSize: 28, fontWeight: 500, color: 'var(--p-ink)',
-                lineHeight: 1.15, letterSpacing: -0.5, margin: 0,
+                fontSize: 24, fontWeight: 500, color: 'var(--p-ink)',
+                lineHeight: 1.2, letterSpacing: -0.4, margin: '0 0 5px',
               }}>
                 {coffee.name}
               </h1>
               {coffee.processing && (
-                <div style={{ fontSize: 12, color: 'var(--p-muted)', marginTop: 6 }}>
+                <div style={{ fontSize: 12, color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
                   {coffee.processing}
                 </div>
               )}
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8, flexShrink: 0 }}>
-              <QRSection coffeeId={id} coffeeName={coffee.name} />
             </div>
           </div>
 
@@ -102,8 +108,9 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {coffee.flavor_notes.split(',').map((t: string) => (
                 <div key={t} className="neu-sm" style={{
-                  padding: '5px 12px', borderRadius: 12,
+                  padding: '5px 12px', borderRadius: 14,
                   fontSize: 10, fontWeight: 500, color: 'var(--p-text)',
+                  fontFamily: 'Inter, sans-serif',
                 }}>
                   {t.trim()}
                 </div>
@@ -112,7 +119,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
           )}
         </div>
 
-        {/* INFO / BREW / STORY 탭 */}
+        {/* ── INFO / BREW / STORY 탭 ── */}
         <DetailTabs
           coffee={coffee}
           storeUrl={storeUrl}

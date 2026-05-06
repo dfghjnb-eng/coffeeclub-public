@@ -10,6 +10,8 @@
   --p-muted:  #888578;
   --p-dim:    #B0AC9E;
   --p-accent: #FF7F40;
+  --p-peach:  #FFB48A;
+  --p-lemon:  #F5D547;
 
   /* ── 기존 테마 변수 (ThemeApplier 호환) ── */
   --c-primary: #FF7F40;
