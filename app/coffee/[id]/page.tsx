@@ -51,7 +51,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
     <div className="min-h-screen" style={{ background: 'var(--p-bg)' }}>
       <VisitTracker coffeeId={id} />
 
-      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 60px' }}>
+      <div style={{ maxWidth: 640, margin: '0 auto', padding: '0 20px 140px' }}>
 
         {/* ── 상단 버튼 행 ── */}
         <div style={{
