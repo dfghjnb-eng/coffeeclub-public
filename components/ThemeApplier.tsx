@@ -47,6 +47,11 @@ export default function ThemeApplier() {
     // 어드민 저장 후 3초 내 자동 반영
     const interval = setInterval(fetchAndApply, 3000)
 
+    // 어드민에게 "준비됨" 신호 전송 → 어드민이 현재 편집값을 즉시 flush
+    try {
+      window.parent.postMessage({ type: 'themeReady' }, '*')
+    } catch (_) {}
+
     // 어드민 편집창 → postMessage 실시간 수신
     function onMessage(e: MessageEvent) {
       const msg = e.data
