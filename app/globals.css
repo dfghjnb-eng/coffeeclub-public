@@ -6,6 +6,11 @@
   --p-bg:     #EDEAE3;
   --p-bg-alt: #F2EFE8;
   --p-ink:    #1A1A1A;
+
+  /* ── 뉴모피즘 그림자 (배경색 기반 자동 계산) ── */
+  --sh-d:  rgba(180,175,160,0.45);
+  --sh-ds: rgba(180,175,160,0.35);
+  --sh-l:  rgba(255,255,255,0.85);
   --p-text:   #2B2B2B;
   --p-muted:  #888578;
   --p-dim:    #B0AC9E;
@@ -56,30 +61,30 @@ body {
 
 .serif { font-family: 'Fraunces', serif; }
 
-/* ── 뉴모피즘 shadows ── */
+/* ── 뉴모피즘 shadows (CSS 변수 기반 — 어드민 실시간 연동) ── */
 .neu {
   background: var(--p-bg);
   box-shadow:
-    8px 8px 18px rgba(180,175,160,0.45),
-    -6px -6px 16px rgba(255,255,255,0.85);
+    8px 8px 18px var(--sh-d),
+    -6px -6px 16px var(--sh-l);
 }
 .neu-sm {
   background: var(--p-bg);
   box-shadow:
-    4px 4px 10px rgba(180,175,160,0.35),
-    -3px -3px 8px rgba(255,255,255,0.85);
+    4px 4px 10px var(--sh-ds),
+    -3px -3px 8px var(--sh-l);
 }
 .neu-inset {
   background: var(--p-bg);
   box-shadow:
-    inset 4px 4px 8px rgba(180,175,160,0.45),
-    inset -3px -3px 6px rgba(255,255,255,0.85);
+    inset 4px 4px 8px var(--sh-d),
+    inset -3px -3px 6px var(--sh-l);
 }
 .neu-pill {
-  background: linear-gradient(145deg, #F2EFE8, #E5E2DB);
+  background: linear-gradient(145deg, var(--p-bg-alt, #F2EFE8), var(--p-bg));
   box-shadow:
-    6px 6px 14px rgba(180,175,160,0.4),
-    -5px -5px 12px rgba(255,255,255,0.85);
+    6px 6px 14px var(--sh-d),
+    -5px -5px 12px var(--sh-l);
 }
 
 .no-scroll::-webkit-scrollbar { display: none; }
