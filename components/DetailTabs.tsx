@@ -5,6 +5,9 @@ import FlavorSlider from './FlavorSlider'
 import ExtractionGuide from './ExtractionGuide'
 import type { Coffee } from '@/lib/supabase'
 
+type Tab = 'info' | 'brew' | 'story'
+const TAB_ORDER: Tab[] = ['info', 'brew', 'story']
+
 type Props = {
   coffee: Coffee
   storeUrl?: string
@@ -14,50 +17,60 @@ type Props = {
 }
 
 export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, storeText }: Props) {
-  const [tab, setTab] = useState<'info' | 'brew' | 'story'>('info')
+  const [tab, setTab]   = useState<Tab>('info')
+  const [dir, setDir]   = useState<'right' | 'left'>('right')
+  const [animKey, setAnimKey] = useState(0)
 
-  const drip = coffee.extraction_guide?.drip || {}
-  const esp  = coffee.extraction_guide?.espresso || {}
-  const fg   = coffee.flavor_graph || {}
+  function switchTab(next: Tab) {
+    const oldIdx = TAB_ORDER.indexOf(tab)
+    const newIdx = TAB_ORDER.indexOf(next)
+    setDir(newIdx >= oldIdx ? 'right' : 'left')
+    setTab(next)
+    setAnimKey(k => k + 1)
+  }
+
+  const drip  = coffee.extraction_guide?.drip || {}
+  const esp   = coffee.extraction_guide?.espresso || {}
+  const fg    = coffee.flavor_graph || {}
   const quote = coffee.literary_quote || {}
 
-  const TABS: { id: 'info' | 'brew' | 'story'; label: string }[] = [
-    { id: 'info',  label: 'INFO' },
-    { id: 'brew',  label: 'BREW' },
+  const TABS: { id: Tab; label: string }[] = [
+    { id: 'info',  label: 'INFO'  },
+    { id: 'brew',  label: 'BREW'  },
     { id: 'story', label: 'STORY' },
   ]
 
   return (
     <div>
-      {/* 탭 바 */}
+      {/* ── 탭 바 ── */}
       <div className="neu-inset" style={{
         borderRadius: 22, padding: 5,
         display: 'flex', gap: 4, marginBottom: 16,
       }}>
         {TABS.map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} style={{
-            flex: 1,
-            padding: '10px',
-            borderRadius: 18,
-            border: 'none',
-            cursor: 'pointer',
+          <button key={t.id} onClick={() => switchTab(t.id)} style={{
+            flex: 1, padding: '10px', borderRadius: 18,
+            border: 'none', cursor: 'pointer',
             fontFamily: 'Inter, sans-serif',
             background: tab === t.id ? 'var(--p-bg)' : 'transparent',
             boxShadow: tab === t.id
               ? '4px 4px 8px rgba(180,175,160,0.35), -3px -3px 6px rgba(255,255,255,0.85)'
               : 'none',
-            fontSize: 10,
-            fontWeight: 600,
-            letterSpacing: 1,
+            fontSize: 10, fontWeight: 600, letterSpacing: 1,
             color: tab === t.id ? 'var(--p-ink)' : 'var(--p-muted)',
             transition: 'all 0.18s ease',
+            transform: 'scale(1)',
           }}>
             {t.label}
           </button>
         ))}
       </div>
 
-      {/* ── INFO 탭 ── */}
+      {/* ── 탭 컨텐츠 (슬라이딩) ── */}
+      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}
+        style={{ overflow: 'hidden' }}>
+
+      {/* INFO 탭 */}
       {tab === 'info' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* 기본 정보 카드 */}
@@ -138,7 +151,7 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {tab === 'brew' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           <ExtractionGuide drip={drip} esp={esp} />
-          {/* 추출 시작하기 → 단계별 타이머로 이동 */}
+          {/* 타이머 PRO → 단계별 타이머로 이동 */}
           <Link href={`/timer/${coffee.id}`} style={{ textDecoration: 'none' }}>
             <div className="neu-pill" style={{
               borderRadius: 32, height: 64,
@@ -147,10 +160,10 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
             }}>
               <div>
                 <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
-                  START BREWING
+                  PHASE TIMER
                 </div>
                 <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
-                  추출 시작하기
+                  타이머 PRO
                 </div>
               </div>
               <div style={{
@@ -225,6 +238,8 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
           )}
         </div>
       )}
+
+      </div>{/* ── 슬라이딩 래퍼 닫기 ── */}
 
       {/* 스토어 버튼 */}
       {storeUrl && (

@@ -90,7 +90,7 @@ function Stopwatch() {
     <div style={{ marginTop: 14 }}>
       {/* 시간 표시 */}
       <div className="neu" style={{ borderRadius: 24, padding: '24px 20px', textAlign: 'center', marginBottom: 12 }}>
-        <div style={{ fontSize: 9, color: '#888578', letterSpacing: 1.5, marginBottom: 10 }}>BREW TIMER</div>
+        <div style={{ fontSize: 9, color: '#888578', letterSpacing: 1.5, marginBottom: 10 }}>간편 추출 타이머</div>
         <div className="serif" style={{
           fontSize: 56, fontWeight: 300, color: running ? '#FF7F40' : '#1A1A1A',
           letterSpacing: -2, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
@@ -139,15 +139,27 @@ function Stopwatch() {
   )
 }
 
+const TAB_ORDER_EG: Array<'drip' | 'esp'> = ['drip', 'esp']
+
 export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: EspGuide }) {
-  const [tab, setTab] = useState<'drip' | 'esp'>('drip')
+  const [tab, setTab]     = useState<'drip' | 'esp'>('drip')
+  const [dir, setDir]     = useState<'right' | 'left'>('right')
+  const [animKey, setAnimKey] = useState(0)
+
+  function switchTab(next: 'drip' | 'esp') {
+    const oldIdx = TAB_ORDER_EG.indexOf(tab)
+    const newIdx = TAB_ORDER_EG.indexOf(next)
+    setDir(newIdx >= oldIdx ? 'right' : 'left')
+    setTab(next)
+    setAnimKey(k => k + 1)
+  }
 
   return (
     <div>
       {/* 드립 / 에스프레소 전환 */}
       <div className="neu-inset" style={{ borderRadius: 20, padding: 4, display: 'flex', gap: 4, marginBottom: 14 }}>
         {(['drip', 'esp'] as const).map((id) => (
-          <button key={id} onClick={() => setTab(id)} style={{
+          <button key={id} onClick={() => switchTab(id)} style={{
             flex: 1, padding: '9px', borderRadius: 17,
             border: 'none', cursor: 'pointer',
             fontFamily: 'Inter, sans-serif',
@@ -164,7 +176,9 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
         ))}
       </div>
 
-      {/* 파라미터 그리드 */}
+      {/* 파라미터 그리드 — 슬라이딩 애니메이션 */}
+      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}
+        style={{ overflow: 'hidden' }}>
       <div className="neu" style={{ borderRadius: 24, padding: '18px' }}>
         <div style={{ fontSize: 9, color: '#888578', letterSpacing: 1.5, marginBottom: 14 }}>PARAMETERS</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
@@ -196,6 +210,7 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
           )}
         </div>
       </div>
+      </div>{/* ── 슬라이딩 래퍼 닫기 ── */}
 
       {/* 타이머 — 탭 전환 시 초기화 */}
       <Stopwatch key={tab} />
