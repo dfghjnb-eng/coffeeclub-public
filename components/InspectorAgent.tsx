@@ -28,6 +28,7 @@ export default function InspectorAgent() {
     })()
     if (!inIframe) return
 
+    let active = true
     let prevEl: HTMLElement | null = null
     let prevOutline = ''
     let prevOutlineOffset = ''
@@ -41,6 +42,7 @@ export default function InspectorAgent() {
     }
 
     function onMouseOver(e: MouseEvent) {
+      if (!active) return
       const target = e.target as HTMLElement
       if (!target || target.tagName === 'HTML' || target.tagName === 'BODY') return
       if (prevEl === target) return
@@ -58,6 +60,7 @@ export default function InspectorAgent() {
     }
 
     function onClick(e: MouseEvent) {
+      if (!active) return
       e.preventDefault()
       e.stopPropagation()
 
@@ -90,14 +93,23 @@ export default function InspectorAgent() {
       }, '*')
     }
 
+    function onMessage(e: MessageEvent) {
+      const msg = e.data
+      if (!msg || msg.type !== 'inspectorToggle') return
+      active = !!msg.active
+      if (!active) restorePrev()   // 즉시 하이라이트 제거
+    }
+
     document.addEventListener('mouseover', onMouseOver)
     document.addEventListener('mouseout', onMouseOut)
     document.addEventListener('click', onClick, true)
+    window.addEventListener('message', onMessage)
 
     return () => {
       document.removeEventListener('mouseover', onMouseOver)
       document.removeEventListener('mouseout', onMouseOut)
       document.removeEventListener('click', onClick, true)
+      window.removeEventListener('message', onMessage)
       restorePrev()
     }
   }, [])
