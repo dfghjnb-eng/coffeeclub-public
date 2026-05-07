@@ -44,7 +44,7 @@ function parseMl(str?: string): number {
 }
 
 /** pour_method에서 분할 물량 파싱
- *  "3회 분할 (40-80-90-90ml)"  → [40, 80, 90, 90]
+ *  "3회 분할 (40-87-87-86ml)"  → [40, 87, 87, 86]   (bloom 포함 전체)
  *  "(30-120-100ml)"            → [30, 120, 100]
  *  실패 시 null 반환 */
 function parsePourMethod(str?: string): number[] | null {
@@ -56,7 +56,7 @@ function parsePourMethod(str?: string): number[] | null {
 }
 
 /* ══════════════════════════════════════════
-   원두 데이터 → Phase 배열 생성
+   원두 데이터 → Phase 배열 생성 (분할 횟수 동적)
 ══════════════════════════════════════════ */
 interface Phase {
   label: string
@@ -74,37 +74,43 @@ function buildPhases(coffee: Coffee): Phase[] {
   const totalMl    = parseMl(drip.water_amount)
   const totalSec   = parseSeconds(drip.time)
 
-  const remainSec  = Math.max(totalSec - bloomSec, 90)
-  const remainMl   = Math.max(totalMl - bloomMl, 0)
+  const remainSec = Math.max(totalSec - bloomSec, 60)
+  const remainMl  = Math.max(totalMl - bloomMl, 0)
 
-  // pour_method에서 분할 물량 파싱 시도
+  // pour_method 파싱: [bloom, p1, p2, ...] → p1 이후가 실제 붓기 물량
   const pourParts = parsePourMethod(drip.pour_method)
 
-  let pourWaters: string[]
-  if (pourParts && pourParts.length === 3) {
-    pourWaters = pourParts.map(n => `${n}ml`)
-  } else if (pourParts && pourParts.length === 4) {
-    // bloom 포함 4개일 경우 뒤 3개 사용
-    pourWaters = pourParts.slice(1).map(n => `${n}ml`)
+  let pourMls: number[]
+  if (pourParts && pourParts.length >= 2) {
+    // 첫 번째 숫자 = bloom → 나머지가 붓기 횟수만큼의 물량
+    pourMls = pourParts.slice(1)
   } else {
-    // 균등 3분할
-    const p1 = Math.round(remainMl / 3)
-    const p2 = Math.round(remainMl / 3)
-    const p3 = remainMl - p1 - p2
-    pourWaters = [`${p1}ml`, `${p2}ml`, `${p3}ml`]
+    // fallback: 균등 3분할
+    const p = Math.round(remainMl / 3)
+    pourMls = [p, p, remainMl - p * 2]
   }
 
-  // 시간 3분할
-  const t1 = Math.round(remainSec / 3)
-  const t2 = Math.round(remainSec / 3)
-  const t3 = remainSec - t1 - t2
+  const pourCount = pourMls.length
 
-  return [
-    { label: '뜸들이기', en: 'BLOOM',  duration: bloomSec, water: bloomWater },
-    { label: '1차 붓기', en: 'POUR 1', duration: t1,       water: pourWaters[0] },
-    { label: '2차 붓기', en: 'POUR 2', duration: t2,       water: pourWaters[1] },
-    { label: '3차 붓기', en: 'POUR 3', duration: t3,       water: pourWaters[2] },
+  // 남은 시간을 붓기 횟수로 균등 분할 (마지막에 나머지 초 배분)
+  const baseT = Math.floor(remainSec / pourCount)
+  const times = pourMls.map((_, i) =>
+    i < pourCount - 1 ? baseT : remainSec - baseT * (pourCount - 1)
+  )
+
+  const phases: Phase[] = [
+    { label: '뜸들이기', en: 'BLOOM', duration: bloomSec, water: bloomWater },
   ]
+  pourMls.forEach((ml, i) => {
+    phases.push({
+      label: `${i + 1}차 붓기`,
+      en:    `POUR ${i + 1}`,
+      duration: times[i],
+      water: `${ml}ml`,
+    })
+  })
+
+  return phases
 }
 
 /* ══════════════════════════════════════════
