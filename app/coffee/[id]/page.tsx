@@ -43,7 +43,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
   if (!coffee) notFound()
 
   const storeUrl   = settings['store_url']        || ''
-  const storeLabel = settings['store_label']      || '스마트스토어 가기'
+  const storeLabel = settings['store_label']      || '커피기술 마켓가기'
   const storeBg    = settings['store_color']      || '#03C75A'
   const storeText  = settings['store_text_color'] || '#ffffff'
 

@@ -240,27 +240,28 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
 
       </div>{/* ── 슬라이딩 래퍼 닫기 ── */}
 
-      {/* 스토어 버튼 */}
-      {storeUrl && (
-        <a
-          href={storeUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ textDecoration: 'none', display: 'block', marginTop: 14 }}
-        >
-          <div className="neu-pill" style={{
-            borderRadius: 32, height: 64,
-            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            padding: '0 10px 0 22px',
-          }}>
-            <div>
-              <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
-                SHOP
-              </div>
-              <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
-                {storeLabel || '스마트스토어 가기'}
-              </div>
+      {/* 스토어 버튼 — URL 유무 관계없이 항상 완전히 표시 */}
+      <a
+        href={storeUrl || '#'}
+        target={storeUrl ? '_blank' : '_self'}
+        rel="noopener noreferrer"
+        style={{
+          textDecoration: 'none', display: 'block', marginTop: 14,
+        }}
+      >
+        <div className="neu-pill" style={{
+          borderRadius: 32, height: 64,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 10px 0 22px',
+        }}>
+          <div>
+            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
+              SHOP
             </div>
+            <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
+              {storeLabel || '커피기술 마켓가기'}
+            </div>
+          </div>
             <div style={{
               width: 48, height: 48, borderRadius: 24,
               background: 'var(--p-ink)',
@@ -274,7 +275,6 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
             </div>
           </div>
         </a>
-      )}
       {/* 하단 탭바 여백 */}
       <div style={{ height: 24 }} />
     </div>
