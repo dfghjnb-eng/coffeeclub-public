@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import ThemeApplier from '@/components/ThemeApplier'
+import InspectorAgent from '@/components/InspectorAgent'
 import BottomNav from '@/components/BottomNav'
 
 export const metadata: Metadata = {
@@ -13,6 +14,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body className="min-h-screen no-scroll" style={{ background: 'var(--p-bg)', color: 'var(--p-ink)', fontFamily: "'Inter', sans-serif" }}>
         <ThemeApplier />
+        <InspectorAgent />
         {children}
         <BottomNav />
       </body>
