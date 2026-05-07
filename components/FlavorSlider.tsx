@@ -10,10 +10,17 @@ const LABELS: Record<string, string> = {
 }
 const KEYS = ['acidity', 'sweetness', 'body', 'bitterness', 'aroma', 'balance']
 
+// dot colors are now driven by CSS variables (--dot-0 … --dot-5)
+// keeping fallback constants only for the SVG gradient defs (which need literal values)
 const FLAVOR_COLORS = {
   peach: '#FFB48A',
   herb:  '#9DC08B',
   lemon: '#F5D547',
+}
+
+// CSS-var fill helper
+function dotFill(i: number): string {
+  return `var(--dot-${Math.min(i, 5)})`
 }
 
 export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
@@ -68,17 +75,15 @@ export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
             stroke="#B0AC9E" strokeWidth="1" />
         ))}
         {dotPositions.map((p, i) => {
-          const accentColor = i === 0 ? FLAVOR_COLORS.peach
-            : i === labels.length - 1 ? FLAVOR_COLORS.lemon
-            : null
           const isHighlight = i === 1
           return (
             <g key={i}>
               {isHighlight && (
-                <circle cx={p.x} cy={p.y} r="11" fill={FLAVOR_COLORS.peach} opacity="0.3" />
+                <circle cx={p.x} cy={p.y} r="11"
+                  style={{ fill: dotFill(i) }} opacity="0.3" />
               )}
               <circle cx={p.x} cy={p.y} r={isHighlight ? 5.5 : 6.5}
-                fill={isHighlight ? FLAVOR_COLORS.peach : (accentColor || '#1A1A1A')} />
+                style={{ fill: dotFill(i) }} />
             </g>
           )
         })}

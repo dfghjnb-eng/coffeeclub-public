@@ -70,6 +70,10 @@ export default function InspectorAgent() {
       const cs = window.getComputedStyle(target)
       const rect = target.getBoundingClientRect()
 
+      // SVG elements expose fill/stroke via computed style
+      const fill   = cs.getPropertyValue('fill').trim()
+      const stroke = cs.getPropertyValue('stroke').trim()
+
       window.parent.postMessage({
         type: 'inspect',
         data: {
@@ -78,6 +82,8 @@ export default function InspectorAgent() {
           className: (typeof target.className === 'string' ? target.className : '').slice(0, 120),
           color: cs.color,
           backgroundColor: cs.backgroundColor,
+          fill,
+          stroke,
           fontSize: cs.fontSize,
           fontWeight: cs.fontWeight,
           fontFamily: cs.fontFamily.split(',')[0].trim().replace(/['"]/g, ''),

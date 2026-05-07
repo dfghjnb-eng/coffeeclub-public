@@ -42,6 +42,14 @@
   --sz-gap: 14px;
   --sz-border: 0px;
 
+  /* ── 플레이버 도트 색상 ── */
+  --dot-0: #FFB48A;
+  --dot-1: #FFB48A;
+  --dot-2: #831100;
+  --dot-3: #1A1A1A;
+  --dot-4: #38571A;
+  --dot-5: #F5D547;
+
   /* ── 섹션 순서 ── */
   --order-info: 1;
   --order-flavor: 2;
