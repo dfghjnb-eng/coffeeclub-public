@@ -67,8 +67,7 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       </div>
 
       {/* ── 탭 컨텐츠 (슬라이딩) ── */}
-      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}
-        style={{ overflow: 'hidden' }}>
+      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}>
 
       {/* INFO 탭 */}
       {tab === 'info' && (

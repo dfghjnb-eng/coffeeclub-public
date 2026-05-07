@@ -177,8 +177,7 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
       </div>
 
       {/* 파라미터 그리드 — 슬라이딩 애니메이션 */}
-      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}
-        style={{ overflow: 'hidden' }}>
+      <div key={animKey} className={dir === 'right' ? 'slide-right' : 'slide-left'}>
       <div className="neu" style={{ borderRadius: 24, padding: '18px' }}>
         <div style={{ fontSize: 9, color: '#888578', letterSpacing: 1.5, marginBottom: 14 }}>PARAMETERS</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>

@@ -90,15 +90,18 @@ body {
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes slideRight {
-  from { opacity: 0; transform: translateX(18px); }
+  from { opacity: 0; transform: translateX(14px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 @keyframes slideLeft {
-  from { opacity: 0; transform: translateX(-18px); }
+  from { opacity: 0; transform: translateX(-14px); }
   to   { opacity: 1; transform: translateX(0); }
 }
 .slide-right { animation: slideRight 0.22s ease; }
 .slide-left  { animation: slideLeft  0.22s ease; }
+/* 슬라이딩 중 박스 쉐도우 클리핑 방지 */
+.slide-right,
+.slide-left  { overflow: visible; }
 
 /* ── 버튼 Press 액션 ── */
 button:active,
