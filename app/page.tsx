@@ -214,16 +214,20 @@ export default async function CatalogPage({
 /* 원산지별 이모지/아이콘 */
 function OriginEmoji({ origin, large }: { origin: string; large?: boolean }) {
   const size = large ? 28 : 22
-  if (origin.includes('브라질'))   return <span style={{ fontSize: size }}>🇧🇷</span>
-  if (origin.includes('에티오피아')) return <span style={{ fontSize: size }}>🇪🇹</span>
-  if (origin.includes('케냐'))     return <span style={{ fontSize: size }}>🇰🇪</span>
-  if (origin.includes('콜롬비아')) return <span style={{ fontSize: size }}>🇨🇴</span>
-  if (origin.includes('온두라스')) return <span style={{ fontSize: size }}>🇭🇳</span>
-  if (origin.includes('과테말라')) return <span style={{ fontSize: size }}>🇬🇹</span>
-  if (origin.includes('인도네시아')) return <span style={{ fontSize: size }}>🇮🇩</span>
-  if (origin.includes('파나마'))   return <span style={{ fontSize: size }}>🇵🇦</span>
-  if (origin.includes('코스타리카')) return <span style={{ fontSize: size }}>🇨🇷</span>
-  if (origin.includes('예멘'))     return <span style={{ fontSize: size }}>🇾🇪</span>
+  const o = origin.toLowerCase()
+  if (o.includes('브라질')    || o.includes('brazil'))      return <span style={{ fontSize: size }}>🇧🇷</span>
+  if (o.includes('에티오피아') || o.includes('ethiopia'))   return <span style={{ fontSize: size }}>🇪🇹</span>
+  if (o.includes('케냐')      || o.includes('kenya'))       return <span style={{ fontSize: size }}>🇰🇪</span>
+  if (o.includes('콜롬비아')  || o.includes('colombia'))    return <span style={{ fontSize: size }}>🇨🇴</span>
+  if (o.includes('온두라스')  || o.includes('honduras'))    return <span style={{ fontSize: size }}>🇭🇳</span>
+  if (o.includes('과테말라')  || o.includes('guatemala'))   return <span style={{ fontSize: size }}>🇬🇹</span>
+  if (o.includes('인도네시아') || o.includes('indonesia'))  return <span style={{ fontSize: size }}>🇮🇩</span>
+  if (o.includes('파나마')    || o.includes('panama'))      return <span style={{ fontSize: size }}>🇵🇦</span>
+  if (o.includes('코스타리카') || o.includes('costa rica')) return <span style={{ fontSize: size }}>🇨🇷</span>
+  if (o.includes('예멘')      || o.includes('yemen'))       return <span style={{ fontSize: size }}>🇾🇪</span>
+  if (o.includes('페루')      || o.includes('peru'))        return <span style={{ fontSize: size }}>🇵🇪</span>
+  if (o.includes('르완다')    || o.includes('rwanda'))      return <span style={{ fontSize: size }}>🇷🇼</span>
+  if (o.includes('엘살바도르') || o.includes('el salvador')) return <span style={{ fontSize: size }}>🇸🇻</span>
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="#888578" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
       <ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(-25 12 12)"/>

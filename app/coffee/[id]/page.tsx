@@ -19,16 +19,20 @@ async function getCoffee(id: string): Promise<Coffee | null> {
 
 /* 원산지 이모지 */
 function OriginFlag({ origin }: { origin: string }) {
-  if (origin.includes('브라질'))    return <>🇧🇷</>
-  if (origin.includes('에티오피아')) return <>🇪🇹</>
-  if (origin.includes('케냐'))      return <>🇰🇪</>
-  if (origin.includes('콜롬비아'))  return <>🇨🇴</>
-  if (origin.includes('온두라스'))  return <>🇭🇳</>
-  if (origin.includes('과테말라'))  return <>🇬🇹</>
-  if (origin.includes('인도네시아')) return <>🇮🇩</>
-  if (origin.includes('파나마'))    return <>🇵🇦</>
-  if (origin.includes('코스타리카')) return <>🇨🇷</>
-  if (origin.includes('예멘'))      return <>🇾🇪</>
+  const o = origin.toLowerCase()
+  if (o.includes('브라질')    || o.includes('brazil'))       return <>🇧🇷</>
+  if (o.includes('에티오피아') || o.includes('ethiopia'))    return <>🇪🇹</>
+  if (o.includes('케냐')      || o.includes('kenya'))        return <>🇰🇪</>
+  if (o.includes('콜롬비아')  || o.includes('colombia'))     return <>🇨🇴</>
+  if (o.includes('온두라스')  || o.includes('honduras'))     return <>🇭🇳</>
+  if (o.includes('과테말라')  || o.includes('guatemala'))    return <>🇬🇹</>
+  if (o.includes('인도네시아') || o.includes('indonesia'))   return <>🇮🇩</>
+  if (o.includes('파나마')    || o.includes('panama'))       return <>🇵🇦</>
+  if (o.includes('코스타리카') || o.includes('costa rica'))  return <>🇨🇷</>
+  if (o.includes('예멘')      || o.includes('yemen'))        return <>🇾🇪</>
+  if (o.includes('페루')      || o.includes('peru'))         return <>🇵🇪</>
+  if (o.includes('르완다')    || o.includes('rwanda'))       return <>🇷🇼</>
+  if (o.includes('엘살바도르') || o.includes('el salvador')) return <>🇸🇻</>
   return (
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888578" strokeWidth="1.6" strokeLinecap="round">
       <ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(-25 12 12)"/>
