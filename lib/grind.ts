@@ -11,6 +11,24 @@ export const COINS = [
 
 export type Circle = { x: number; y: number; r: number }
 
+/* EK43 참고 눈금. 실측이 아니라 환산값이다.
+   Honest Coffee Guide 는 EK43 전체 범위를 180~803μm 로 적고, 브루잉별 눈금 구간이 이 범위를 직선으로
+   나눈 값과 맞는다. 예: 400μm → 0~16 눈금판 5.7, 700μm → 13.3 (V60 구간).
+   눈금은 기계, 버, 0점에 따라 달라지므로 매장 EK43 실측표가 생기면 그것으로 바꿀 것. */
+const EK43_MIN_UM = 180
+const EK43_MAX_UM = 803
+export const EK43_DIALS = [
+  { key: 'ek16', label: '0~16 눈금판', min: 0, max: 16 },
+  { key: 'ek11', label: '1~11 눈금판', min: 1, max: 11 },
+] as const
+
+export function ek43DialText(um: number, dial: { min: number; max: number }) {
+  if (um < EK43_MIN_UM) return `${dial.min} 아래`
+  if (um > EK43_MAX_UM) return `${dial.max} 이상`
+  const value = dial.min + ((um - EK43_MIN_UM) / (EK43_MAX_UM - EK43_MIN_UM)) * (dial.max - dial.min)
+  return `약 ${Math.round(value * 2) / 2}`
+}
+
 export type GrindOptions = {
   umPerPx: number
   coin?: Circle

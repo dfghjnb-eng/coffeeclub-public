@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import { analyzeGrind, COINS, DEFAULT_THRESHOLD } from '@/lib/grind'
+import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, ek43DialText } from '@/lib/grind'
 import type { Circle, GrindResult, HistogramBin } from '@/lib/grind'
 
 const MAX_PIXELS = 16_000_000   // 아이폰 사파리 캔버스 한도
@@ -12,7 +12,10 @@ const KEPT_COLOR = 'rgba(255, 90, 20, 0.8)'
 const CLUMP_COLOR = 'rgba(20, 110, 255, 0.8)'
 
 type Shot = { canvas: HTMLCanvasElement; width: number; height: number; name: string }
-type GrindRecord = { label: string; d10: number; d50: number; d90: number; span: number; count: number; umPerPx: number; photo: string }
+type GrindRecord = {
+  label: string; d10: number; d50: number; d90: number; span: number; count: number; umPerPx: number; photo: string
+  ek16?: string; ek11?: string // 이 항목을 넣기 전에 저장한 기록에는 없다
+}
 
 const CARD: CSSProperties = { borderRadius: 'var(--sz-radius)', padding: 18, marginBottom: 14 }
 const LABEL: CSSProperties = { fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.857)', fontWeight: 600, color: 'var(--p-ink)', marginBottom: 6 }
@@ -265,6 +268,7 @@ export default function GrindLab() {
       d10: Math.round(result.d10), d50: Math.round(result.d50), d90: Math.round(result.d90),
       span: Math.round(result.span * 100) / 100, count: result.count,
       umPerPx: Math.round(result.umPerPx * 10) / 10, photo: shot.name,
+      ek16: ek43DialText(result.d50, EK43_DIALS[0]), ek11: ek43DialText(result.d50, EK43_DIALS[1]),
     }]
     setRecords(next); writeRecords(next); setLabel('')
   }
@@ -275,8 +279,8 @@ export default function GrindLab() {
   }
 
   async function copyRecords() {
-    const header = '설정\tD10\tD50\tD90\t퍼짐\t입자수\t1픽셀(μm)\t사진'
-    const rows = records.map((r) => [r.label, r.d10, r.d50, r.d90, r.span, r.count, r.umPerPx, r.photo].join('\t'))
+    const header = '설정\tD10\tD50\tD90\t퍼짐\t입자수\t1픽셀(μm)\t말코닉 참고(0~16)\t말코닉 참고(1~11)\t사진'
+    const rows = records.map((r) => [r.label, r.d10, r.d50, r.d90, r.span, r.count, r.umPerPx, r.ek16 ?? '', r.ek11 ?? '', r.photo].join('\t'))
     try {
       await navigator.clipboard.writeText([header, ...rows].join('\n'))
       setCopied(true)
@@ -382,6 +386,17 @@ export default function GrindLab() {
               <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-name) * 1.778)', fontWeight: 600, color: 'var(--p-ink)', letterSpacing: -0.5 }}>
                 {result.count ? umText(result.d50) : '측정 불가'}
               </div>
+              {result.count > 0 && (
+                <div style={{ marginTop: 4 }}>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 1.143)', fontWeight: 600, color: 'var(--p-ink)' }}>
+                    말코닉 EK43 기준 {ek43DialText(result.d50, EK43_DIALS[0])}
+                  </div>
+                  <div style={NOTE}>구형 1~11 눈금판이면 {ek43DialText(result.d50, EK43_DIALS[1])}</div>
+                  <div style={{ ...NOTE, marginTop: 4 }}>
+                    참고값입니다. D50을 Honest Coffee Guide 표로 환산했으며, 실제 눈금은 기계와 버, 0점에 따라 달라집니다.
+                  </div>
+                </div>
+              )}
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 8, margin: '12px 0' }}>
                 {[
                   ['D10', umText(result.d10)],
@@ -439,7 +454,7 @@ export default function GrindLab() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-ink)' }}>
                 <thead>
                   <tr style={{ color: 'var(--p-muted)', textAlign: 'left' }}>
-                    {['설정', 'D50', 'D10', 'D90', '퍼짐', '입자'].map((h) => <th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
+                    {['설정', 'D50', 'EK 0~16', 'EK 1~11', 'D10', 'D90', '퍼짐', '입자'].map((h) =><th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -447,6 +462,8 @@ export default function GrindLab() {
                     <tr key={`${r.label}-${i}`} style={{ borderTop: '1px solid var(--p-line)' }}>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.label}</td>
                       <td style={{ padding: '6px 8px 6px 0', fontWeight: 600 }}>{r.d50}</td>
+                      <td style={{ padding: '6px 8px 6px 0', whiteSpace: 'nowrap' }}>{r.ek16 ?? '-'}</td>
+                      <td style={{ padding: '6px 8px 6px 0', whiteSpace: 'nowrap' }}>{r.ek11 ?? '-'}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.d10}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.d90}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.span}</td>
