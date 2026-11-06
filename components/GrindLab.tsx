@@ -454,7 +454,7 @@ export default function GrindLab() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-ink)' }}>
                 <thead>
                   <tr style={{ color: 'var(--p-muted)', textAlign: 'left' }}>
-                    {['설정', 'D50', 'EK 0~16', 'EK 1~11', 'D10', 'D90', '퍼짐', '입자'].map((h) =><th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
+                    {['설정', 'D50', '말코닉', '구형 눈금', 'D10', 'D90', '퍼짐', '입자'].map((h) =><th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
