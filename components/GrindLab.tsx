@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, ek43DialText } from '@/lib/grind'
+import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, EK43_SOURCE_URL, ek43DialText } from '@/lib/grind'
 import type { Circle, GrindResult, HistogramBin } from '@/lib/grind'
 
 const MAX_PIXELS = 16_000_000   // 아이폰 사파리 캔버스 한도
@@ -399,7 +399,7 @@ export default function GrindLab() {
                   </div>
                   <div style={NOTE}>구형 1~11 눈금판이면 {ek43DialText(result.d50, EK43_DIALS[1])}</div>
                   <div style={{ ...NOTE, marginTop: 4 }}>
-                    아직 매장 EK43으로 보정하지 않은 참고값입니다. D50을 Honest Coffee Guide 표로 환산했으며, 실제 눈금과 다를 수 있습니다.
+                    아직 보정 전 참고값입니다. <a href={EK43_SOURCE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Onyx Coffee Lab</a>의 EK43 측정 자료로 환산했으며, 이 페이지의 D50이 더 크게 나오는 편이라 실제 눈금보다 높게 나올 수 있습니다. 정밀도는 ±1 정도입니다.
                   </div>
                 </div>
               )}

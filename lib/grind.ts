@@ -11,22 +11,28 @@ export const COINS = [
 
 export type Circle = { x: number; y: number; r: number }
 
-/* EK43 참고 눈금. 실측이 아니라 환산값이다.
-   Honest Coffee Guide 는 EK43 전체 범위를 180~803μm 로 적고, 브루잉별 눈금 구간이 이 범위를 직선으로
-   나눈 값과 맞는다. 예: 400μm → 0~16 눈금판 5.7, 700μm → 13.3 (V60 구간).
-   눈금은 기계, 버, 0점에 따라 달라지므로 매장 EK43 실측표가 생기면 그것으로 바꿀 것. */
-const EK43_MIN_UM = 180
-const EK43_MAX_UM = 803
+/* EK43 참고 눈금. 매장 기계를 잰 값이 아니라 공개 자료로 환산한 값이다.
+   Onyx Coffee Lab Grind Calculator 의 EK43(0~16) 측정 곡선: μm = 396.01 × e^(0.057 × 눈금) (DiFluid Omni).
+   눈금 0~4 는 측정값이 430~480μm 로 거의 평평해 구분할 수 없고, 이웃 눈금끼리 흔들려 정밀도는 ±1 정도다.
+   이 페이지의 D50 은 Onyx 값보다 크게 나온다(눈금 9에서 약 1.55배). 매장 EK43 실측으로 보정할 때까지 참고용이다.
+   구형 1~11 눈금판은 Honest Coffee Guide 의 두 눈금판 표가 보여 주는 관계(구형 = 1 + 눈금 × 10/16)로 바꾼다. */
+const EK43_CURVE_A = 396.01
+const EK43_CURVE_K = 0.057
+const EK43_FLAT_BELOW = 4
+const EK43_TOP = 16
 export const EK43_DIALS = [
-  { key: 'ek16', label: '0~16 눈금판', min: 0, max: 16 },
-  { key: 'ek11', label: '1~11 눈금판', min: 1, max: 11 },
+  { key: 'ek16', label: '0~16 눈금판', scale: (dial: number) => dial },
+  { key: 'ek11', label: '1~11 눈금판', scale: (dial: number) => 1 + dial * (10 / 16) },
 ] as const
 
-export function ek43DialText(um: number, dial: { min: number; max: number }) {
-  if (um < EK43_MIN_UM) return `${dial.min} 아래`
-  if (um > EK43_MAX_UM) return `${dial.max} 이상`
-  const value = dial.min + ((um - EK43_MIN_UM) / (EK43_MAX_UM - EK43_MIN_UM)) * (dial.max - dial.min)
-  return `약 ${Math.round(value * 2) / 2}`
+export const EK43_SOURCE_URL = 'https://onyxcoffeelab.com/pages/grind-size-calculator'
+
+export function ek43DialText(um: number, dial: { scale: (dial: number) => number }) {
+  const value = Math.log(um / EK43_CURVE_A) / EK43_CURVE_K
+  const show = (d: number) => Math.round(dial.scale(d) * 2) / 2
+  if (value <= EK43_FLAT_BELOW) return `${show(EK43_FLAT_BELOW)} 이하 (구분 어려움)`
+  if (value >= EK43_TOP) return `${show(EK43_TOP)} 이상`
+  return `약 ${Math.round(dial.scale(value))}`
 }
 
 export type GrindOptions = {
