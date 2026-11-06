@@ -1,5 +1,6 @@
 import { supabase, Coffee } from '@/lib/supabase'
 import Link from 'next/link'
+import RoastCode from '@/components/RoastCode'
 
 export const dynamic = 'force-dynamic'
 
@@ -42,7 +43,7 @@ export default async function SearchPage({
 
         {/* 제목 */}
         <h1 className="serif" style={{
-          fontSize: 30, fontWeight: 500, color: 'var(--p-ink)',
+          fontSize: 'calc(var(--sz-hero) * 1.071)', fontWeight: 500, color: 'var(--p-ink)',
           letterSpacing: -0.6, marginBottom: 20,
         }}>
           Search
@@ -51,11 +52,11 @@ export default async function SearchPage({
         {/* 검색 인풋 */}
         <form action="/search" method="GET">
           <div className="neu-inset" style={{
-            borderRadius: 30, padding: '0 18px',
+            borderRadius: 'calc(var(--sz-radius) * 1.25)', padding: '0 18px',
             display: 'flex', alignItems: 'center', gap: 10, marginBottom: 28,
           }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-              stroke="#888578" strokeWidth="1.7" strokeLinecap="round">
+              stroke="var(--p-muted)" strokeWidth="1.7" strokeLinecap="round">
               <circle cx="11" cy="11" r="7"/>
               <path d="M16.5 16.5L21 21"/>
             </svg>
@@ -67,12 +68,12 @@ export default async function SearchPage({
               style={{
                 flex: 1, border: 'none', outline: 'none',
                 background: 'transparent', padding: '16px 0',
-                fontFamily: 'Inter, sans-serif', fontSize: 15,
+                fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 1.071)',
                 color: 'var(--p-text)',
               }}
             />
             {query && (
-              <Link href="/search" style={{ textDecoration: 'none', color: 'var(--p-dim)', fontSize: 18, lineHeight: 1 }}>
+              <Link href="/search" style={{ textDecoration: 'none', color: 'var(--p-dim)', fontSize: 'var(--sz-name)', lineHeight: 1 }}>
                 ×
               </Link>
             )}
@@ -83,7 +84,7 @@ export default async function SearchPage({
         {!query && (
           <div>
             <div style={{
-              fontSize: 9, fontWeight: 600, color: 'var(--p-muted)',
+              fontSize: 'calc(var(--sz-label) * 0.818)', fontWeight: 600, color: 'var(--p-muted)',
               letterSpacing: 1.5, marginBottom: 14,
               fontFamily: 'Inter, sans-serif',
             }}>
@@ -93,8 +94,8 @@ export default async function SearchPage({
               {POPULAR_TAGS.map(tag => (
                 <Link key={tag} href={`/search?q=${encodeURIComponent(tag)}`} style={{ textDecoration: 'none' }}>
                   <div className="neu-sm" style={{
-                    padding: '8px 16px', borderRadius: 20,
-                    fontSize: 13, fontWeight: 500, color: 'var(--p-text)',
+                    padding: '8px 16px', borderRadius: 'calc(var(--sz-radius) * 0.833)',
+                    fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 500, color: 'var(--p-text)',
                     fontFamily: 'Inter, sans-serif',
                     cursor: 'pointer',
                   }}>
@@ -110,7 +111,7 @@ export default async function SearchPage({
         {query && (
           <div>
             <div style={{
-              fontSize: 9, fontWeight: 600, color: 'var(--p-muted)',
+              fontSize: 'calc(var(--sz-label) * 0.818)', fontWeight: 600, color: 'var(--p-muted)',
               letterSpacing: 1.5, marginBottom: 14,
               fontFamily: 'Inter, sans-serif',
             }}>
@@ -119,9 +120,9 @@ export default async function SearchPage({
 
             {results.length === 0 ? (
               <div className="neu-inset" style={{
-                borderRadius: 24, padding: '48px 20px', textAlign: 'center',
+                borderRadius: 'var(--sz-radius)', padding: '48px 20px', textAlign: 'center',
               }}>
-                <div className="serif" style={{ fontSize: 16, color: 'var(--p-muted)' }}>
+                <div className="serif" style={{ fontSize: 'calc(var(--sz-body) * 1.143)', color: 'var(--p-muted)' }}>
                   "{query}" 에 해당하는 원두를 찾을 수 없어요
                 </div>
               </div>
@@ -130,24 +131,24 @@ export default async function SearchPage({
                 {results.map(coffee => (
                   <Link key={coffee.id} href={`/coffee/${coffee.id}`} style={{ textDecoration: 'none' }}>
                     <div className="neu" style={{
-                      borderRadius: 20, padding: '14px 16px',
+                      borderRadius: 'calc(var(--sz-radius) * 0.833)', padding: '14px 16px',
                       display: 'flex', alignItems: 'center', gap: 12,
                     }}>
                       <div className="neu-sm" style={{
-                        width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                        width: 48, height: 48, borderRadius: 'calc(var(--sz-radius) * 0.583)', flexShrink: 0,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 26,
+                        fontSize: 'calc(var(--sz-name) * 1.444)',
                       }}>
                         <OriginEmoji origin={coffee.origin ?? ''} />
                       </div>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div className="serif" style={{
-                          fontSize: 15, fontWeight: 500, color: 'var(--p-ink)', marginBottom: 3,
+                          fontSize: 'calc(var(--sz-body) * 1.071)', fontWeight: 500, color: 'var(--p-ink)', marginBottom: 3,
                         }}>
-                          {coffee.name}
+                          <RoastCode roast={coffee.extraction_guide?.roast} />{coffee.name}
                         </div>
                         <div style={{
-                          fontSize: 11, color: 'var(--p-muted)', marginBottom: 6,
+                          fontSize: 'var(--sz-label)', color: 'var(--p-muted)', marginBottom: 6,
                           fontFamily: 'Inter, sans-serif',
                         }}>
                           {[coffee.origin, coffee.processing].filter(Boolean).join(' · ')}
@@ -156,7 +157,7 @@ export default async function SearchPage({
                           <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
                             {coffee.flavor_notes.split(',').slice(0, 3).map((t: string) => (
                               <span key={t} style={{
-                                fontSize: 9, padding: '2px 8px', borderRadius: 8,
+                                fontSize: 'calc(var(--sz-label) * 0.818)', padding: '2px 8px', borderRadius: 'calc(var(--sz-radius) * 0.333)',
                                 background: 'var(--p-bg-alt)', color: 'var(--p-text)',
                                 fontFamily: 'Inter, sans-serif', fontWeight: 500,
                               }}>{t.trim()}</span>
@@ -165,7 +166,7 @@ export default async function SearchPage({
                         )}
                       </div>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-                        stroke="#B0AC9E" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+                        stroke="var(--p-dim)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M9 6l6 6-6 6"/>
                       </svg>
                     </div>

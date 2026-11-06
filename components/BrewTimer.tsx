@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import type { Coffee } from '@/lib/supabase'
+import RoastCode from '@/components/RoastCode'
 
 /* ══════════════════════════════════════════
    파싱 유틸리티
@@ -184,46 +185,46 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '18px 0 16px' }}>
           <Link href="/timer" style={{ textDecoration: 'none' }}>
             <div className="neu-sm" style={{
-              width: 42, height: 42, borderRadius: 21, flexShrink: 0,
+              width: 42, height: 42, borderRadius: 'calc(var(--sz-radius) * 0.875)', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
-                stroke="#1A1A1A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                stroke="var(--p-ink)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M11 18l-6-6 6-6"/>
               </svg>
             </div>
           </Link>
           <div>
-            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+            <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
               BREW TIMER
             </div>
-            <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
-              {coffee.name}
+            <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 0.944)', fontWeight: 500, color: 'var(--p-ink)' }}>
+              <RoastCode roast={coffee.extraction_guide?.roast} />{coffee.name}
             </div>
           </div>
         </div>
 
         {/* ── 메인 타이머 카드 ── */}
-        <div className="neu" style={{ borderRadius: 28, padding: '28px 24px', textAlign: 'center', marginBottom: 12 }}>
+        <div className="neu" style={{ borderRadius: 'calc(var(--sz-radius) * 1.167)', padding: '28px 24px', textAlign: 'center', marginBottom: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 16 }}>
             <div style={{
-              width: 8, height: 8, borderRadius: 4,
-              background: running ? '#FF7F40' : '#B0AC9E',
+              width: 8, height: 8, borderRadius: 'calc(var(--sz-radius) * 0.167)',
+              background: running ? 'var(--p-accent)' : 'var(--p-dim)',
               transition: 'background 0.3s',
             }} />
-            <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>
-              {isDone ? 'DONE' : running ? 'RECORDING' : 'PAUSED'}
+            <span style={{ fontSize: 'calc(var(--sz-label) * 0.818)', fontWeight: 600, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>
+              {isDone ? 'DONE' : running ? 'BREWING' : 'PAUSED'}
             </span>
           </div>
           <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
             <div className="serif" style={{
-              fontSize: 64, fontWeight: 300, color: 'var(--p-ink)',
+              fontSize: 'calc(var(--sz-hero) * 2.286)', fontWeight: 300, color: 'var(--p-ink)',
               letterSpacing: -3, lineHeight: 1, fontVariantNumeric: 'tabular-nums',
             }}>
               {m}:{s}
             </div>
             <div className="serif" style={{
-              fontSize: 28, fontWeight: 300, color: 'var(--p-muted)',
+              fontSize: 'var(--sz-hero)', fontWeight: 300, color: 'var(--p-muted)',
               marginBottom: 4, marginLeft: 2, fontVariantNumeric: 'tabular-nums',
             }}>
               .{cs}
@@ -233,45 +234,45 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
 
         {/* ── 현재 Phase 카드 ── */}
         {!isDone ? (
-          <div className="neu" style={{ borderRadius: 24, padding: '18px 20px', marginBottom: 12 }}>
+          <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '18px 20px', marginBottom: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
               <div>
-                <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 4 }}>
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 4 }}>
                   PHASE {phase + 1} / {phases.length}
                 </div>
-                <div className="serif" style={{ fontSize: 22, fontWeight: 500, color: 'var(--p-ink)' }}>
+                <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 1.222)', fontWeight: 500, color: 'var(--p-ink)' }}>
                   {phases[phase].label}
                 </div>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 4 }}>
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 4 }}>
                   WATER
                 </div>
-                <div className="serif" style={{ fontSize: 22, fontWeight: 500, color: '#FFB48A' }}>
+                <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 1.222)', fontWeight: 500, color: 'var(--p-peach)' }}>
                   {phases[phase].water}
                 </div>
               </div>
             </div>
             {/* 단계 진행률 */}
-            <div className="neu-inset" style={{ borderRadius: 8, height: 10, overflow: 'hidden' }}>
+            <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.333)', height: 10, overflow: 'hidden' }}>
               <div style={{
-                height: '100%', borderRadius: 8,
+                height: '100%', borderRadius: 'calc(var(--sz-radius) * 0.333)',
                 background: 'var(--p-ink)',
                 width: `${phaseProg * 100}%`,
                 transition: 'width 0.1s linear',
               }} />
             </div>
-            <div style={{ fontSize: 10, color: 'var(--p-muted)', marginTop: 6, fontFamily: 'Inter, sans-serif', textAlign: 'right' }}>
+            <div style={{ fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)', marginTop: 6, fontFamily: 'Inter, sans-serif', textAlign: 'right' }}>
               {secLeft}초 남음 / {phases[phase].duration}초
             </div>
           </div>
         ) : (
-          <div className="neu" style={{ borderRadius: 24, padding: '28px 20px', marginBottom: 12, textAlign: 'center' }}>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>☕</div>
-            <div className="serif" style={{ fontSize: 22, fontWeight: 500, color: 'var(--p-ink)', marginBottom: 4 }}>
+          <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '28px 20px', marginBottom: 12, textAlign: 'center' }}>
+            <div style={{ fontSize: 'calc(var(--sz-hero) * 1.143)', marginBottom: 10 }}>☕</div>
+            <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 1.222)', fontWeight: 500, color: 'var(--p-ink)', marginBottom: 4 }}>
               추출 완료!
             </div>
-            <div style={{ fontSize: 13, color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
+            <div style={{ fontSize: 'calc(var(--sz-body) * 0.929)', color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
               총 {m}:{s} 소요
             </div>
           </div>
@@ -286,17 +287,17 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
               <div key={i} style={{ flex: 1, textAlign: 'center' }}>
                 <div
                   className={isCompleted || isCurrent ? 'neu-sm' : 'neu-inset'}
-                  style={{ borderRadius: 12, padding: '8px 2px' }}
+                  style={{ borderRadius: 'calc(var(--sz-radius) * 0.5)', padding: '8px 2px' }}
                 >
                   <div style={{
-                    fontSize: 13, fontWeight: 700,
-                    color: isCompleted ? '#FF7F40' : isCurrent ? 'var(--p-ink)' : 'var(--p-dim)',
+                    fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 700,
+                    color: isCompleted ? 'var(--p-accent)' : isCurrent ? 'var(--p-ink)' : 'var(--p-dim)',
                     marginBottom: 2, fontFamily: 'Inter, sans-serif',
                   }}>
                     {isCompleted ? '✓' : i + 1}
                   </div>
                   <div style={{
-                    fontSize: 7, letterSpacing: 0.5, fontWeight: 600,
+                    fontSize: 'calc(var(--sz-label) * 0.636)', letterSpacing: 0.5, fontWeight: 600,
                     color: isCurrent ? 'var(--p-text)' : 'var(--p-dim)',
                     fontFamily: 'Inter, sans-serif',
                   }}>
@@ -312,16 +313,16 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
         <div style={{ marginBottom: 20 }}>
           <div style={{
             display: 'flex', justifyContent: 'space-between',
-            fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5,
+            fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5,
             fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 6,
           }}>
             <span>TOTAL PROGRESS</span>
             <span>{Math.round(totalProg * 100)}%</span>
           </div>
-          <div className="neu-inset" style={{ borderRadius: 8, height: 8, overflow: 'hidden' }}>
+          <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.333)', height: 8, overflow: 'hidden' }}>
             <div style={{
-              height: '100%', borderRadius: 8,
-              background: 'linear-gradient(to right, #FFB48A, #F5D547)',
+              height: '100%', borderRadius: 'calc(var(--sz-radius) * 0.333)',
+              background: 'linear-gradient(to right, var(--p-peach), var(--p-lemon))',
               width: `${totalProg * 100}%`,
               transition: 'width 0.1s linear',
             }} />
@@ -335,7 +336,7 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
             disabled={isDone}
             className="neu-pill"
             style={{
-              flex: 1, height: 64, borderRadius: 32,
+              flex: 1, height: 64, borderRadius: 'calc(var(--sz-radius) * 1.333)',
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '0 10px 0 22px',
               border: 'none', cursor: isDone ? 'default' : 'pointer',
@@ -343,15 +344,15 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
             }}
           >
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-              <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
+              <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600 }}>
                 {running ? 'PAUSE' : ms === 0 ? 'START' : 'RESUME'}
               </div>
-              <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
+              <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 0.944)', fontWeight: 500, color: 'var(--p-ink)' }}>
                 {running ? '일시정지' : ms === 0 ? '추출 시작' : '계속'}
               </div>
             </div>
             <div style={{
-              width: 48, height: 48, borderRadius: 24,
+              width: 48, height: 48, borderRadius: 'var(--sz-radius)',
               background: 'var(--p-ink)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '3px 3px 8px rgba(0,0,0,0.2)',
@@ -370,12 +371,12 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
           </button>
 
           <button onClick={handleReset} className="neu-sm" style={{
-            width: 64, height: 64, borderRadius: 32,
+            width: 64, height: 64, borderRadius: 'calc(var(--sz-radius) * 1.333)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             border: 'none', cursor: 'pointer',
           }}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-              stroke="#2B2B2B" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              stroke="var(--p-text)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 12a9 9 0 109-9"/>
               <path d="M3 4v5h5"/>
             </svg>
@@ -383,8 +384,8 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
         </div>
 
         {/* ── Pour Sequence 요약 ── */}
-        <div className="neu" style={{ borderRadius: 24, padding: '18px 20px', marginBottom: 12 }}>
-          <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 14 }}>
+        <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '18px 20px', marginBottom: 12 }}>
+          <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 14 }}>
             POUR SEQUENCE
           </div>
           {phases.map((p, i) => (
@@ -392,29 +393,29 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
               display: 'flex', alignItems: 'center', gap: 12,
               paddingBottom: i < phases.length - 1 ? 12 : 0,
               marginBottom: i < phases.length - 1 ? 12 : 0,
-              borderBottom: i < phases.length - 1 ? '1px solid #F2EFE8' : 'none',
+              borderBottom: i < phases.length - 1 ? '1px solid var(--p-bg-alt)' : 'none',
               opacity: isDone || i <= phase ? 1 : 0.45,
             }}>
               <div className={i <= phase ? 'neu-sm' : 'neu-inset'} style={{
-                width: 32, height: 32, borderRadius: 16, flexShrink: 0,
+                width: 32, height: 32, borderRadius: 'calc(var(--sz-radius) * 0.667)', flexShrink: 0,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>
                 <span style={{
-                  fontSize: 12, fontWeight: 700, fontFamily: 'Inter, sans-serif',
-                  color: i < phase || isDone ? '#FF7F40' : i === phase ? 'var(--p-ink)' : 'var(--p-dim)',
+                  fontSize: 'calc(var(--sz-body) * 0.857)', fontWeight: 700, fontFamily: 'Inter, sans-serif',
+                  color: i < phase || isDone ? 'var(--p-accent)' : i === phase ? 'var(--p-ink)' : 'var(--p-dim)',
                 }}>
                   {i < phase || isDone ? '✓' : i + 1}
                 </span>
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--p-ink)', fontFamily: 'Inter, sans-serif', marginBottom: 1 }}>
+                <div style={{ fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 600, color: 'var(--p-ink)', fontFamily: 'Inter, sans-serif', marginBottom: 1 }}>
                   {p.label}
                 </div>
-                <div style={{ fontSize: 10, color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
                   {p.duration}초
                 </div>
               </div>
-              <div className="serif" style={{ fontSize: 18, fontWeight: 500, color: '#FFB48A' }}>
+              <div className="serif" style={{ fontSize: 'var(--sz-name)', fontWeight: 500, color: 'var(--p-peach)' }}>
                 {p.water}
               </div>
             </div>
@@ -422,7 +423,7 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
         </div>
 
         {/* ── 레시피 요약 ── */}
-        <div className="neu-inset" style={{ borderRadius: 20, padding: '16px 20px' }}>
+        <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.833)', padding: '16px 20px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
             {[
               { label: 'DOSE',  value: drip.coffee_amount || '-' },
@@ -431,12 +432,17 @@ export default function BrewTimer({ coffee }: { coffee: Coffee }) {
             ].map((item, i) => (
               <div key={i} style={{
                 textAlign: 'center',
-                borderRight: i < 2 ? '1px solid #E5E2DB' : 'none',
+                borderRight: i < 2 ? '1px solid var(--p-line)' : 'none',
               }}>
-                <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)', marginBottom: 4 }}>
-                  {item.value}
+                <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 0.944)', fontWeight: 500, color: 'var(--p-ink)', marginBottom: 4 }}>
+                  {item.value.replace(/\s*\(.*\)$/, '')}
                 </div>
-                <div style={{ fontSize: 8, fontWeight: 600, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>
+                {/\(.+\)$/.test(item.value) && (
+                  <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif', marginBottom: 4, wordBreak: 'keep-all' }}>
+                    {item.value.match(/\((.+)\)$/)?.[1]}
+                  </div>
+                )}
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.727)', fontWeight: 600, color: 'var(--p-muted)', letterSpacing: 1.5, fontFamily: 'Inter, sans-serif' }}>
                   {item.label}
                 </div>
               </div>

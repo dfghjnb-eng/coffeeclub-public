@@ -30,6 +30,9 @@ export type Coffee = {
   origin_story: string
   literary_quote: { text: string; author: string; source: string; translation?: string }
   extraction_guide: {
+    roast?: string        // 원두 이름 앞 표기 (light·medium·dark)
+    guide_roast?: string  // 이 추출가이드 수치의 기준 로스팅
+    recipe?: { id: string; name: string; title: string; source: string }
     drip: {
       coffee_amount?: string; water_amount?: string
       temperature?: string; ratio?: string; grind?: string; time?: string

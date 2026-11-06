@@ -61,8 +61,8 @@ export default function BottomNav() {
     }}>
       <div style={{
         display: 'flex', gap: 4, padding: 8,
-        background: '#F2EFE8',
-        borderRadius: 40,
+        background: 'var(--p-bg-alt)',
+        borderRadius: 'calc(var(--sz-radius) * 1.667)',
         boxShadow: '6px 6px 14px rgba(180,175,160,0.4), -5px -5px 12px rgba(255,255,255,0.85)',
         pointerEvents: 'auto',
       }}>
@@ -73,9 +73,9 @@ export default function BottomNav() {
               <div style={{
                 display: 'flex', alignItems: 'center',
                 padding: '10px 16px',
-                borderRadius: 30,
-                background: isActive ? '#1A1A1A' : 'transparent',
-                color: isActive ? '#ffffff' : '#888578',
+                borderRadius: 'calc(var(--sz-radius) * 1.25)',
+                background: isActive ? 'var(--p-ink)' : 'transparent',
+                color: isActive ? '#ffffff' : 'var(--p-muted)',
                 boxShadow: isActive ? '3px 3px 8px rgba(0,0,0,0.2)' : 'none',
                 transition: 'background 0.28s ease, color 0.28s ease, box-shadow 0.28s ease',
                 gap: 6,
@@ -91,7 +91,7 @@ export default function BottomNav() {
                 {/* 라벨: max-width 슬라이드로 부드럽게 열림/닫힘 */}
                 <span style={{
                   fontFamily: 'Inter, sans-serif',
-                  fontSize: 11, fontWeight: 600, letterSpacing: 0.8,
+                  fontSize: 'var(--sz-label)', fontWeight: 600, letterSpacing: 0.8,
                   whiteSpace: 'nowrap', overflow: 'hidden',
                   maxWidth: isActive ? '52px' : '0px',
                   opacity: isActive ? 1 : 0,

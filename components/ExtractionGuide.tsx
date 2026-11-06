@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { roastInfo } from '@/lib/roast'
 
 const FUTURA = "'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif"
 
@@ -20,6 +21,13 @@ function parsePourSteps(pourMethod?: string): number[] | null {
   if (!m) return null
   const nums = m[1].replace(/ml/gi, '').split('-').map(Number).filter(n => !isNaN(n) && n > 0)
   return nums.length >= 2 ? nums : null
+}
+
+/* "3분 30초", "2분", "45초" → 초. "3분 ~ 3분 30초" 같은 범위는 앞 값을 쓴다 */
+function toSeconds(str?: string): number {
+  const m = (str || '').match(/(\d+)\s*분(?:\s*(\d+)\s*초)?|(\d+)\s*초/)
+  if (!m) return 0
+  return m[3] ? parseInt(m[3]) : parseInt(m[1]) * 60 + parseInt(m[2] || '0')
 }
 
 /* SVG 꺾은선 그래프 */
@@ -48,8 +56,8 @@ function PourLineChart({ steps }: { steps: number[] }) {
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, padding: '0 4px' }}>
         {steps.map((v, i) => (
           <div key={i} style={{ flex: 1, textAlign: 'center' }}>
-            <div style={{ fontFamily: FUTURA, fontSize: 13, fontWeight: 500, color: '#1A1A1A' }}>{v}㎖</div>
-            <div style={{ fontFamily: FUTURA, fontSize: 8, color: '#888578', letterSpacing: '1px', marginTop: 2 }}>
+            <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 500, color: 'var(--p-ink)' }}>{v}㎖</div>
+            <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.727)', color: 'var(--p-muted)', letterSpacing: '1px', marginTop: 2 }}>
               {stepNames[i] ?? `${i}차`}
             </div>
           </div>
@@ -60,25 +68,25 @@ function PourLineChart({ steps }: { steps: number[] }) {
       <svg width="100%" viewBox={`0 0 ${W} ${H}`} fill="none" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
         <defs>
           <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#888578" stopOpacity="0.14"/>
-            <stop offset="100%" stopColor="#888578" stopOpacity="0.01"/>
+            <stop offset="0%" stopColor="var(--p-muted)" stopOpacity="0.14"/>
+            <stop offset="100%" stopColor="var(--p-muted)" stopOpacity="0.01"/>
           </linearGradient>
         </defs>
         {/* 가이드라인 */}
         {[0.25, 0.5, 0.75].map((r, i) => (
           <line key={i} x1={PAD} y1={PAD + r * (H - PAD * 2)} x2={W - PAD} y2={PAD + r * (H - PAD * 2)}
-            stroke="#888578" strokeWidth="0.5" strokeDasharray="3 4" opacity="0.2"/>
+            stroke="var(--p-muted)" strokeWidth="0.5" strokeDasharray="3 4" opacity="0.2"/>
         ))}
         {/* 영역 */}
         <polygon points={area} fill="url(#areaGrad)"/>
         {/* 꺾은선 */}
-        <polyline points={polyline} stroke="#888578" strokeWidth="2"
+        <polyline points={polyline} stroke="var(--p-muted)" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         {/* 포인트 */}
         {pts.map((p, i) => (
           <circle key={i} cx={p.x} cy={p.y} r="4.5"
-            fill="#F0EDE6"
-            stroke={i === 0 ? '#C8A97A' : '#888578'}
+            fill="var(--p-bg)"
+            stroke={i === 0 ? 'var(--p-bloom)' : 'var(--p-muted)'}
             strokeWidth="2"/>
         ))}
       </svg>
@@ -89,14 +97,19 @@ function PourLineChart({ steps }: { steps: number[] }) {
 /* 파라미터 셀 — 큰 버전 */
 function KeyCell({ label, value }: { label: string; value?: string }) {
   if (!value) return null
+  // "96°C (마지막 붓기 80°C)" 처럼 괄호가 있으면 괄호 안을 작은 글씨로 아래에 둔다
+  const parts = value.match(/^([^(]+?)\s*\((.+)\)$/)
   return (
     <div style={{
-      background: 'var(--p-bg)', borderRadius: 18,
+      background: 'var(--p-bg)', borderRadius: 'calc(var(--sz-radius) * 0.75)',
       boxShadow: 'inset 3px 3px 8px rgba(180,175,160,0.4), inset -2px -2px 6px rgba(255,255,255,0.85)',
       padding: '16px 10px 14px', textAlign: 'center',
     }}>
-      <div style={{ fontFamily: FUTURA, fontSize: 8, color: '#888578', letterSpacing: '1.5px', marginBottom: 6, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontFamily: FUTURA, fontSize: 22, fontWeight: 500, color: '#1A1A1A', letterSpacing: '-0.3px' }}>{value}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.727)', color: 'var(--p-muted)', letterSpacing: '1.5px', marginBottom: 6, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-name) * 1.222)', fontWeight: 500, color: 'var(--p-ink)', letterSpacing: '-0.3px' }}>{parts ? parts[1] : value}</div>
+      {parts && (
+        <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)', marginTop: 4, wordBreak: 'keep-all' }}>{parts[2]}</div>
+      )}
     </div>
   )
 }
@@ -106,12 +119,12 @@ function SubCell({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
     <div style={{
-      background: 'var(--p-bg)', borderRadius: 14,
+      background: 'var(--p-bg)', borderRadius: 'calc(var(--sz-radius) * 0.583)',
       boxShadow: '3px 3px 8px rgba(180,175,160,0.35), -2px -2px 6px rgba(255,255,255,0.85)',
       padding: '10px 8px', textAlign: 'center',
     }}>
-      <div style={{ fontFamily: FUTURA, fontSize: 8, color: '#888578', letterSpacing: '1.2px', marginBottom: 3, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontFamily: FUTURA, fontSize: 12, fontWeight: 500, color: '#2B2B2B' }}>{value}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.727)', color: 'var(--p-muted)', letterSpacing: '1.2px', marginBottom: 3, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.857)', fontWeight: 500, color: 'var(--p-text)' }}>{value}</div>
     </div>
   )
 }
@@ -121,12 +134,12 @@ function EspCell({ label, value }: { label: string; value?: string }) {
   if (!value) return null
   return (
     <div style={{
-      background: 'var(--p-bg)', borderRadius: 18,
+      background: 'var(--p-bg)', borderRadius: 'calc(var(--sz-radius) * 0.75)',
       boxShadow: 'inset 3px 3px 8px rgba(180,175,160,0.4), inset -2px -2px 6px rgba(255,255,255,0.85)',
       padding: '14px 12px',
     }}>
-      <div style={{ fontFamily: FUTURA, fontSize: 8, color: '#888578', letterSpacing: '1.2px', marginBottom: 5, fontWeight: 600 }}>{label}</div>
-      <div style={{ fontFamily: FUTURA, fontSize: 18, fontWeight: 500, color: '#1A1A1A' }}>{value}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.727)', color: 'var(--p-muted)', letterSpacing: '1.2px', marginBottom: 5, fontWeight: 600 }}>{label}</div>
+      <div style={{ fontFamily: FUTURA, fontSize: 'var(--sz-name)', fontWeight: 500, color: 'var(--p-ink)' }}>{value}</div>
     </div>
   )
 }
@@ -163,35 +176,35 @@ function Stopwatch() {
 
   return (
     <div style={{ marginTop: 14 }}>
-      <div className="neu" style={{ borderRadius: 24, padding: '24px 20px', textAlign: 'center', marginBottom: 12 }}>
-        <div style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.5px', marginBottom: 10 }}>간편 추출 타이머</div>
+      <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '24px 20px', textAlign: 'center', marginBottom: 12 }}>
+        <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.5px', marginBottom: 10 }}>간편 추출 타이머</div>
         <div style={{
-          fontFamily: FUTURA, fontSize: 56, fontWeight: 300,
-          color: running ? '#FF7F40' : '#1A1A1A',
+          fontFamily: FUTURA, fontSize: 'calc(var(--sz-hero) * 2.0)', fontWeight: 300,
+          color: running ? 'var(--p-accent)' : 'var(--p-ink)',
           letterSpacing: -2, lineHeight: 1,
           fontVariantNumeric: 'tabular-nums', transition: 'color 0.2s',
         }}>
           {mm}<span style={{ opacity: running ? 1 : 0.35 }}>:</span>{ss}
-          <span style={{ fontSize: 24, color: '#888578', marginLeft: 4 }}>.{cs}</span>
+          <span style={{ fontSize: 'calc(var(--sz-name) * 1.333)', color: 'var(--p-muted)', marginLeft: 4 }}>.{cs}</span>
         </div>
-        <div style={{ fontFamily: FUTURA, fontSize: 10, color: '#888578', letterSpacing: '1.5px', marginTop: 8 }}>
-          {running ? '● RECORDING' : 'PAUSED'}
+        <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)', letterSpacing: '1.5px', marginTop: 8 }}>
+          {running ? '● BREWING' : 'PAUSED'}
         </div>
       </div>
       <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
         <button onClick={running ? pause : start} className="neu-pill" style={{
-          flex: 1, borderRadius: 30, height: 60, padding: '0 8px 0 22px',
+          flex: 1, borderRadius: 'calc(var(--sz-radius) * 1.25)', height: 60, padding: '0 8px 0 22px',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12,
           border: 'none', cursor: 'pointer', fontFamily: FUTURA, transition: 'all 0.18s ease',
         }}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-            <div style={{ fontSize: 9, color: '#888578', letterSpacing: '1px' }}>{running ? 'PAUSE' : ms === 0 ? 'START' : 'RESUME'}</div>
-            <div style={{ fontFamily: FUTURA, fontSize: 16, fontWeight: 500, color: '#1A1A1A' }}>
+            <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1px' }}>{running ? 'PAUSE' : ms === 0 ? 'START' : 'RESUME'}</div>
+            <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 1.143)', fontWeight: 500, color: 'var(--p-ink)' }}>
               {running ? '일시정지' : ms === 0 ? '추출 시작' : '계속'}
             </div>
           </div>
           <div style={{
-            width: 46, height: 46, borderRadius: 23, background: '#1A1A1A',
+            width: 46, height: 46, borderRadius: 'calc(var(--sz-radius) * 0.958)', background: 'var(--p-ink)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '4px 4px 10px rgba(0,0,0,0.2)',
           }}>
@@ -202,11 +215,11 @@ function Stopwatch() {
           </div>
         </button>
         <button onClick={reset} className="neu-sm" style={{
-          width: 60, height: 60, borderRadius: 30,
+          width: 60, height: 60, borderRadius: 'calc(var(--sz-radius) * 1.25)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           border: 'none', cursor: 'pointer', transition: 'all 0.18s ease',
         }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2B2B2B" strokeWidth="1.6" strokeLinecap="round">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--p-text)" strokeWidth="1.6" strokeLinecap="round">
             <path d="M3 12a9 9 0 109-9"/><path d="M3 4v5h5"/>
           </svg>
         </button>
@@ -217,7 +230,7 @@ function Stopwatch() {
 
 const TAB_ORDER_EG: Array<'drip' | 'esp'> = ['drip', 'esp']
 
-export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: EspGuide }) {
+export default function ExtractionGuide({ drip, esp, guideRoast }: { drip: DripGuide; esp: EspGuide; guideRoast?: string }) {
   const [tab, setTab] = useState<'drip' | 'esp'>('drip')
   const [dir, setDir] = useState<'right' | 'left'>('right')
   const [animKey, setAnimKey] = useState(0)
@@ -235,18 +248,18 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
   return (
     <div>
       {/* 드립 / 에스프레소 전환 */}
-      <div className="neu-inset" style={{ borderRadius: 20, padding: 4, display: 'flex', gap: 4, marginBottom: 14 }}>
+      <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.833)', padding: 4, display: 'flex', gap: 4, marginBottom: 14 }}>
         {(['drip', 'esp'] as const).map((id) => (
           <button key={id} onClick={() => switchTab(id)} style={{
-            flex: 1, padding: '9px', borderRadius: 17,
+            flex: 1, padding: '9px', borderRadius: 'calc(var(--sz-radius) * 0.708)',
             border: 'none', cursor: 'pointer',
             fontFamily: FUTURA,
             background: tab === id ? 'var(--p-bg)' : 'transparent',
             boxShadow: tab === id
               ? '4px 4px 8px rgba(180,175,160,0.35), -3px -3px 6px rgba(255,255,255,0.85)'
               : 'none',
-            fontSize: 10, fontWeight: 600, letterSpacing: '1.5px',
-            color: tab === id ? '#1A1A1A' : '#888578',
+            fontSize: 'calc(var(--sz-label) * 0.909)', fontWeight: 600, letterSpacing: '1.5px',
+            color: tab === id ? 'var(--p-ink)' : 'var(--p-muted)',
             transition: 'all 0.18s ease',
           }}>
             {id === 'drip' ? 'POUR OVER' : 'ESPRESSO'}
@@ -262,8 +275,15 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
 
             {/* RECIPE 카드 */}
-            <div className="neu" style={{ borderRadius: 24, padding: 18 }}>
-              <div style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 14 }}>RECIPE</div>
+            <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: 18 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 14 }}>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.8px', fontWeight: 600 }}>RECIPE</div>
+                {roastInfo(guideRoast) && (
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)' }}>
+                    {roastInfo(guideRoast)?.label} 기준
+                  </div>
+                )}
+              </div>
 
               {/* 핵심 3개 크게 */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, marginBottom: 10 }}>
@@ -282,8 +302,8 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
 
             {/* POUR GUIDE 카드 */}
             {pourSteps ? (
-              <div className="neu" style={{ borderRadius: 24, padding: 18 }}>
-                <div style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 14 }}>
+              <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: 18 }}>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 14 }}>
                   POUR GUIDE — {drip.pour_method?.split(' ')[0]}
                 </div>
                 <PourLineChart steps={pourSteps} />
@@ -294,15 +314,15 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
                   paddingTop: 8, marginTop: 8,
                 }}>
                   {pourSteps.map((_, i) => {
-                    // bloom=0, 이후 균등 분배 (총 시간 약 3:30 = 210초)
-                    const totalSec = 210
-                    const bloomSec = 45
+                    // 각 붓기를 시작하는 시각. 타이머와 같이 뜸 뒤 남은 시간을 똑같이 나눈다
+                    const totalSec = toSeconds(drip.time) || 210
+                    const bloomSec = toSeconds(drip.bloom_time) || 45
                     const restSec = totalSec - bloomSec
-                    const sec = i === 0 ? 0 : Math.round(bloomSec + (restSec / (pourSteps.length - 1)) * i)
+                    const sec = i === 0 ? 0 : Math.round(bloomSec + (restSec / (pourSteps.length - 1)) * (i - 1))
                     const m = Math.floor(sec / 60)
                     const s = sec % 60
                     return (
-                      <div key={i} style={{ flex: 1, textAlign: 'center', fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '0.5px' }}>
+                      <div key={i} style={{ flex: 1, textAlign: 'center', fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '0.5px' }}>
                         {m}:{String(s).padStart(2, '0')}
                       </div>
                     )
@@ -311,20 +331,20 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
                 {/* DRIPPER */}
                 {drip.dripper && (
                   <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(136,133,120,0.15)', display: 'flex', gap: 10, alignItems: 'center' }}>
-                    <span style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.5px', fontWeight: 600 }}>DRIPPER</span>
-                    <span style={{ fontFamily: FUTURA, fontSize: 12, color: '#2B2B2B' }}>{drip.dripper}</span>
+                    <span style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.5px', fontWeight: 600 }}>DRIPPER</span>
+                    <span style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-text)' }}>{drip.dripper}</span>
                   </div>
                 )}
               </div>
             ) : drip.pour_method ? (
               /* pour_method 파싱 실패 시 텍스트 폴백 */
-              <div className="neu" style={{ borderRadius: 24, padding: 18 }}>
-                <div style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 10 }}>POUR GUIDE</div>
-                <div style={{ fontFamily: FUTURA, fontSize: 13, color: '#2B2B2B' }}>{drip.pour_method}</div>
+              <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: 18 }}>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 10 }}>POUR GUIDE</div>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.929)', color: 'var(--p-text)' }}>{drip.pour_method}</div>
                 {drip.dripper && (
                   <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px solid rgba(136,133,120,0.15)', display: 'flex', gap: 10 }}>
-                    <span style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.5px', fontWeight: 600 }}>DRIPPER</span>
-                    <span style={{ fontFamily: FUTURA, fontSize: 12, color: '#2B2B2B' }}>{drip.dripper}</span>
+                    <span style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.5px', fontWeight: 600 }}>DRIPPER</span>
+                    <span style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-text)' }}>{drip.dripper}</span>
                   </div>
                 )}
               </div>
@@ -333,12 +353,12 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
             {/* NOTES 카드 */}
             {drip.notes && (
               <div style={{
-                background: 'var(--p-bg)', borderRadius: 20,
+                background: 'var(--p-bg)', borderRadius: 'calc(var(--sz-radius) * 0.833)',
                 boxShadow: 'inset 3px 3px 8px rgba(180,175,160,0.4), inset -2px -2px 6px rgba(255,255,255,0.85)',
                 padding: '16px 18px', display: 'flex', gap: 12, alignItems: 'flex-start',
               }}>
-                <div style={{ width: 2, borderRadius: 2, background: '#888578', opacity: 0.45, alignSelf: 'stretch', flexShrink: 0 }}/>
-                <div style={{ fontFamily: FUTURA, fontSize: 13, fontWeight: 400, color: '#2B2B2B', lineHeight: 1.75 }}>
+                <div style={{ width: 2, borderRadius: 2, background: 'var(--p-muted)', opacity: 0.45, alignSelf: 'stretch', flexShrink: 0 }}/>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 400, color: 'var(--p-text)', lineHeight: 1.75 }}>
                   {drip.notes}
                 </div>
               </div>
@@ -348,8 +368,8 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
 
         {/* ── ESPRESSO ── */}
         {tab === 'esp' && (
-          <div className="neu" style={{ borderRadius: 24, padding: 18 }}>
-            <div style={{ fontFamily: FUTURA, fontSize: 9, color: '#888578', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 14 }}>PARAMETERS</div>
+          <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: 18 }}>
+            <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: '1.8px', fontWeight: 600, marginBottom: 14 }}>PARAMETERS</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <EspCell label="TEMP"       value={esp.temperature} />
               <EspCell label="DOSE"       value={esp.dose} />
@@ -362,12 +382,12 @@ export default function ExtractionGuide({ drip, esp }: { drip: DripGuide; esp: E
             {esp.notes && (
               <div style={{
                 marginTop: 10,
-                background: 'var(--p-bg)', borderRadius: 16,
+                background: 'var(--p-bg)', borderRadius: 'calc(var(--sz-radius) * 0.667)',
                 boxShadow: 'inset 3px 3px 8px rgba(180,175,160,0.4), inset -2px -2px 6px rgba(255,255,255,0.85)',
                 padding: '14px 16px', display: 'flex', gap: 12, alignItems: 'flex-start',
               }}>
-                <div style={{ width: 2, borderRadius: 2, background: '#888578', opacity: 0.45, alignSelf: 'stretch', flexShrink: 0 }}/>
-                <div style={{ fontFamily: FUTURA, fontSize: 13, color: '#2B2B2B', lineHeight: 1.75 }}>{esp.notes}</div>
+                <div style={{ width: 2, borderRadius: 2, background: 'var(--p-muted)', opacity: 0.45, alignSelf: 'stretch', flexShrink: 0 }}/>
+                <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-body) * 0.929)', color: 'var(--p-text)', lineHeight: 1.75 }}>{esp.notes}</div>
               </div>
             )}
           </div>

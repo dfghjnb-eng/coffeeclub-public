@@ -1,14 +1,15 @@
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
+import RoastCode from '@/components/RoastCode'
 
 export const revalidate = 60
 
-type CoffeeListItem = { id: string; name: string; origin: string; processing: string }
+type CoffeeListItem = { id: string; name: string; origin: string; processing: string; extraction_guide?: { roast?: string } | null }
 
 async function getCoffees(): Promise<CoffeeListItem[]> {
   const { data } = await supabase
     .from('coffees')
-    .select('id, name, origin, processing')
+    .select('id, name, origin, processing, extraction_guide')
     .eq('published', true)
     .order('created_at', { ascending: false })
   return (data ?? []) as CoffeeListItem[]
@@ -31,13 +32,13 @@ export default async function TimerIndexPage() {
     <div style={{ background: 'var(--p-bg)', minHeight: '100vh' }}>
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '52px 20px 120px' }}>
         <h1 className="serif" style={{
-          fontSize: 28, fontWeight: 500, color: 'var(--p-ink)',
+          fontSize: 'var(--sz-hero)', fontWeight: 500, color: 'var(--p-ink)',
           letterSpacing: -0.5, marginBottom: 6,
         }}>
           Brew Timer
         </h1>
         <p style={{
-          fontSize: 12, color: 'var(--p-muted)', marginBottom: 24,
+          fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)', marginBottom: 24,
           fontFamily: 'Inter, sans-serif',
         }}>
           추출할 원두를 선택하세요
@@ -47,26 +48,26 @@ export default async function TimerIndexPage() {
           {coffees.map(coffee => (
             <Link key={coffee.id} href={`/timer/${coffee.id}`} style={{ textDecoration: 'none' }}>
               <div className="neu" style={{
-                borderRadius: 20, padding: '14px 16px',
+                borderRadius: 'calc(var(--sz-radius) * 0.833)', padding: '14px 16px',
                 display: 'flex', alignItems: 'center', gap: 12,
               }}>
                 <div className="neu-sm" style={{
-                  width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+                  width: 48, height: 48, borderRadius: 'calc(var(--sz-radius) * 0.583)', flexShrink: 0,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 26,
+                  fontSize: 'calc(var(--sz-name) * 1.444)',
                 }}>
                   <OriginEmoji origin={coffee.origin ?? ''} />
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div className="serif" style={{ fontSize: 15, fontWeight: 500, color: 'var(--p-ink)', marginBottom: 2 }}>
-                    {coffee.name}
+                  <div className="serif" style={{ fontSize: 'calc(var(--sz-body) * 1.071)', fontWeight: 500, color: 'var(--p-ink)', marginBottom: 2 }}>
+                    <RoastCode roast={coffee.extraction_guide?.roast} />{coffee.name}
                   </div>
-                  <div style={{ fontSize: 11, color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
+                  <div style={{ fontSize: 'var(--sz-label)', color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
                     {[coffee.origin, coffee.processing].filter(Boolean).join(' · ')}
                   </div>
                 </div>
                 <div style={{
-                  width: 36, height: 36, borderRadius: 18,
+                  width: 36, height: 36, borderRadius: 'calc(var(--sz-radius) * 0.75)',
                   background: 'var(--p-ink)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>

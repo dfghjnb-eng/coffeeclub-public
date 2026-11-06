@@ -13,9 +13,9 @@ const KEYS = ['acidity', 'sweetness', 'body', 'bitterness', 'aroma', 'balance']
 // dot colors are now driven by CSS variables (--dot-0 … --dot-5)
 // keeping fallback constants only for the SVG gradient defs (which need literal values)
 const FLAVOR_COLORS = {
-  peach: '#FFB48A',
-  herb:  '#9DC08B',
-  lemon: '#F5D547',
+  peach: 'var(--p-peach)',
+  herb:  'var(--p-herb)',
+  lemon: 'var(--p-lemon)',
 }
 
 // CSS-var fill helper
@@ -27,7 +27,7 @@ export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
   const activeKeys = KEYS.filter(k => fg[k] !== undefined && fg[k] !== null)
   if (activeKeys.length === 0) {
     return (
-      <div style={{ padding: '20px 0', textAlign: 'center', color: '#B0AC9E', fontSize: 13 }}>
+      <div style={{ padding: '20px 0', textAlign: 'center', color: 'var(--p-dim)', fontSize: 'calc(var(--sz-body) * 0.929)' }}>
         향미 데이터 없음
       </div>
     )
@@ -72,7 +72,7 @@ export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
           <line key={i}
             x1={padL} x2={W - padR + 6}
             y1={18 + i * ROW_H} y2={18 + i * ROW_H}
-            stroke="#B0AC9E" strokeWidth="1" />
+            stroke="var(--p-dim)" strokeWidth="1" />
         ))}
         {dotPositions.map((p, i) => {
           const isHighlight = i === 1
@@ -95,10 +95,10 @@ export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
           position: 'absolute',
           right: W - padL + 8,
           top: 18 + i * ROW_H - 6,
-          fontSize: 9,
+          fontSize: 'calc(var(--sz-label) * 0.818)',
           fontFamily: 'Inter',
           fontWeight: 500,
-          color: '#2B2B2B',
+          color: 'var(--p-text)',
           letterSpacing: 1,
           textTransform: 'uppercase',
           textAlign: 'right',
@@ -112,10 +112,10 @@ export default function FlavorSlider({ fg }: { fg: Record<string, number> }) {
           position: 'absolute',
           left: W - padR + 12,
           top: 18 + i * ROW_H - 6,
-          fontSize: 10,
+          fontSize: 'calc(var(--sz-label) * 0.909)',
           fontFamily: 'Fraunces, serif',
           fontWeight: 500,
-          color: '#888578',
+          color: 'var(--p-muted)',
         }}>{Math.round(v * 100)}</div>
       ))}
     </div>

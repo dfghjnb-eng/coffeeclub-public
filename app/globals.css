@@ -17,21 +17,11 @@
   --p-accent: #FF7F40;
   --p-peach:  #FFB48A;
   --p-lemon:  #F5D547;
+  --p-herb:   #9DC08B;
+  --p-bloom:  #C8A97A;
+  --p-line:   #E5E2DB;
 
   /* ── 기존 테마 변수 (ThemeApplier 호환) ── */
-  --c-primary: #FF7F40;
-  --c-primary-light: #FF9D6C;
-  --c-primary-bg: #FFF0E8;
-  --c-page-bg: #EDEAE3;
-  --c-card-bg: #EDEAE3;
-  --c-header-bg: #EDEAE3;
-  --c-text-1: #1A1A1A;
-  --c-text-2: #2B2B2B;
-  --c-text-3: #888578;
-  --c-border: rgba(180,175,160,0.3);
-  --c-quote-bg: #1A1A1A;
-  --c-tag-bg: #F2EFE8;
-  --c-tag-text: #2B2B2B;
   --sz-hero: 28px;
   --sz-name: 18px;
   --sz-body: 14px;

@@ -44,19 +44,19 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
     <div>
       {/* ── 탭 바 ── */}
       <div className="neu-inset" style={{
-        borderRadius: 22, padding: 5,
+        borderRadius: 'calc(var(--sz-radius) * 0.917)', padding: 5,
         display: 'flex', gap: 4, marginBottom: 16,
       }}>
         {TABS.map(t => (
           <button key={t.id} onClick={() => switchTab(t.id)} style={{
-            flex: 1, padding: '10px', borderRadius: 18,
+            flex: 1, padding: '10px', borderRadius: 'calc(var(--sz-radius) * 0.75)',
             border: 'none', cursor: 'pointer',
             fontFamily: 'Inter, sans-serif',
             background: tab === t.id ? 'var(--p-bg)' : 'transparent',
             boxShadow: tab === t.id
               ? '4px 4px 8px rgba(180,175,160,0.35), -3px -3px 6px rgba(255,255,255,0.85)'
               : 'none',
-            fontSize: 10, fontWeight: 600, letterSpacing: 1,
+            fontSize: 'calc(var(--sz-label) * 0.909)', fontWeight: 600, letterSpacing: 1,
             color: tab === t.id ? 'var(--p-ink)' : 'var(--p-muted)',
             transition: 'all 0.18s ease',
             transform: 'scale(1)',
@@ -73,8 +73,8 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {tab === 'info' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {/* 기본 정보 카드 */}
-          <div className="neu" style={{ borderRadius: 24, padding: '18px' }}>
-            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
+          <div className="neu sec-info" style={{ borderRadius: 'var(--sz-radius)', padding: '18px' }}>
+            <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
               COFFEE DATA
             </div>
             {[
@@ -86,24 +86,24 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
               <div key={k as string} style={{
                 display: 'flex', justifyContent: 'space-between',
                 padding: '10px 0',
-                borderBottom: i < arr.length - 1 ? '1px solid #F2EFE8' : 'none',
+                borderBottom: i < arr.length - 1 ? '1px solid var(--p-bg-alt)' : 'none',
               }}>
-                <span style={{ fontSize: 12, color: 'var(--p-muted)' }}>{k}</span>
-                <span className="serif" style={{ fontSize: 13, fontWeight: 500, color: 'var(--p-ink)' }}>{v}</span>
+                <span style={{ fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)' }}>{k}</span>
+                <span className="serif" style={{ fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 500, color: 'var(--p-ink)' }}>{v}</span>
               </div>
             ))}
 
             {/* 맛 노트 태그 */}
             {coffee.flavor_notes && (
-              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid #F2EFE8' }}>
-                <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 10 }}>
+              <div style={{ marginTop: 14, paddingTop: 14, borderTop: '1px solid var(--p-bg-alt)' }}>
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 10 }}>
                   TASTING NOTES
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 7 }}>
                   {coffee.flavor_notes.split(',').map(t => (
                     <div key={t} className="neu-sm" style={{
-                      padding: '6px 12px', borderRadius: 12,
-                      fontSize: 11, fontWeight: 500, color: 'var(--p-text)',
+                      padding: '6px 12px', borderRadius: 'calc(var(--sz-radius) * 0.5)',
+                      fontSize: 'var(--sz-label)', fontWeight: 500, color: 'var(--p-text)',
                     }}>{t.trim()}</div>
                   ))}
                 </div>
@@ -113,8 +113,8 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
 
           {/* 향미 슬라이더 */}
           {Object.keys(fg).length > 0 && (
-            <div className="neu" style={{ borderRadius: 24, padding: '18px 14px' }}>
-              <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14, padding: '0 4px' }}>
+            <div className="neu sec-flavor" style={{ borderRadius: 'var(--sz-radius)', padding: '18px 14px' }}>
+              <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14, padding: '0 4px' }}>
                 FLAVOR PROFILE
               </div>
               <FlavorSlider fg={fg} />
@@ -123,22 +123,22 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
 
           {/* 인용구 */}
           {quote.text && (
-            <div className="neu-inset" style={{ borderRadius: 22, padding: '18px' }}>
+            <div className="neu-inset sec-quote" style={{ borderRadius: 'calc(var(--sz-radius) * 0.917)', padding: '18px' }}>
               <div className="serif" style={{
-                fontSize: 14, fontWeight: 400, color: 'var(--p-text)',
+                fontSize: 'var(--sz-body)', fontWeight: 400, color: 'var(--p-text)',
                 lineHeight: 1.7, fontStyle: 'italic', marginBottom: 8,
               }}>
                 &ldquo;{quote.text}&rdquo;
               </div>
               {quote.translation && (
                 <div style={{
-                  fontSize: 12, color: 'var(--p-muted)',
+                  fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)',
                   lineHeight: 1.6, marginBottom: 10,
                 }}>
                   {quote.translation}
                 </div>
               )}
-              <div style={{ fontSize: 10, color: 'var(--p-muted)', letterSpacing: 0.5 }}>
+              <div style={{ fontSize: 'calc(var(--sz-label) * 0.909)', color: 'var(--p-muted)', letterSpacing: 0.5 }}>
                 — {quote.author}{quote.source ? ` / ${quote.source}` : ''}
               </div>
             </div>
@@ -149,24 +149,24 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {/* ── BREW 탭 ── */}
       {tab === 'brew' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <ExtractionGuide drip={drip} esp={esp} />
+          <ExtractionGuide drip={drip} esp={esp} guideRoast={coffee.extraction_guide?.guide_roast} />
           {/* 타이머 PRO → 단계별 타이머로 이동 */}
           <Link href={`/timer/${coffee.id}`} style={{ textDecoration: 'none' }}>
             <div className="neu-pill" style={{
-              borderRadius: 32, height: 64,
+              borderRadius: 'calc(var(--sz-radius) * 1.333)', height: 64,
               display: 'flex', alignItems: 'center', justifyContent: 'space-between',
               padding: '0 10px 0 22px',
             }}>
               <div>
-                <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
+                <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
                   PHASE TIMER
                 </div>
-                <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
+                <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 0.944)', fontWeight: 500, color: 'var(--p-ink)' }}>
                   타이머 PRO
                 </div>
               </div>
               <div style={{
-                width: 48, height: 48, borderRadius: 24,
+                width: 48, height: 48, borderRadius: 'var(--sz-radius)',
                 background: 'var(--p-ink)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 boxShadow: '3px 3px 8px rgba(0,0,0,0.2)',
@@ -184,31 +184,31 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {tab === 'story' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
           {coffee.origin_story ? (
-            <div className="neu" style={{ borderRadius: 24, padding: '22px' }}>
-              <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
+            <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '22px' }}>
+              <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
                 ORIGIN STORY
               </div>
               <p className="serif" style={{
-                fontSize: 15, fontWeight: 400, color: 'var(--p-text)', lineHeight: 1.8,
+                fontSize: 'calc(var(--sz-body) * 1.071)', fontWeight: 400, color: 'var(--p-text)', lineHeight: 1.8,
               }}>
                 {coffee.origin_story}
               </p>
             </div>
           ) : (
-            <div className="neu-inset" style={{ borderRadius: 22, padding: '40px 20px', textAlign: 'center' }}>
-              <div className="serif" style={{ fontSize: 16, color: 'var(--p-muted)' }}>원산지 이야기가 없습니다</div>
+            <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.917)', padding: '40px 20px', textAlign: 'center' }}>
+              <div className="serif" style={{ fontSize: 'calc(var(--sz-body) * 1.143)', color: 'var(--p-muted)' }}>원산지 이야기가 없습니다</div>
             </div>
           )}
 
           {coffee.flavor_notes && (
-            <div className="neu" style={{ borderRadius: 24, padding: '18px' }}>
-              <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
+            <div className="neu" style={{ borderRadius: 'var(--sz-radius)', padding: '18px' }}>
+              <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5, marginBottom: 14 }}>
                 TASTING NOTES
               </div>
               <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                 {coffee.flavor_notes.split(',').map(n => (
-                  <div key={n} className="neu-sm" style={{ padding: '10px 14px', borderRadius: 14 }}>
-                    <div className="serif" style={{ fontSize: 14, fontWeight: 500, color: 'var(--p-ink)' }}>
+                  <div key={n} className="neu-sm" style={{ padding: '10px 14px', borderRadius: 'calc(var(--sz-radius) * 0.583)' }}>
+                    <div className="serif" style={{ fontSize: 'var(--sz-body)', fontWeight: 500, color: 'var(--p-ink)' }}>
                       {n.trim()}
                     </div>
                   </div>
@@ -218,19 +218,19 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
           )}
 
           {quote.text && (
-            <div className="neu-inset" style={{ borderRadius: 22, padding: '20px' }}>
+            <div className="neu-inset" style={{ borderRadius: 'calc(var(--sz-radius) * 0.917)', padding: '20px' }}>
               <div className="serif" style={{
-                fontSize: 15, fontWeight: 400, color: 'var(--p-ink)',
+                fontSize: 'calc(var(--sz-body) * 1.071)', fontWeight: 400, color: 'var(--p-ink)',
                 lineHeight: 1.7, fontStyle: 'italic', marginBottom: 10,
               }}>
                 &ldquo;{quote.text}&rdquo;
               </div>
               {quote.translation && (
-                <div style={{ fontSize: 13, color: 'var(--p-muted)', lineHeight: 1.6, marginBottom: 10 }}>
+                <div style={{ fontSize: 'calc(var(--sz-body) * 0.929)', color: 'var(--p-muted)', lineHeight: 1.6, marginBottom: 10 }}>
                   {quote.translation}
                 </div>
               )}
-              <div style={{ fontSize: 11, color: 'var(--p-muted)', letterSpacing: 0.5 }}>
+              <div style={{ fontSize: 'var(--sz-label)', color: 'var(--p-muted)', letterSpacing: 0.5 }}>
                 — {quote.author}{quote.source ? ` / ${quote.source}` : ''}
               </div>
             </div>
@@ -250,20 +250,20 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
         }}
       >
         <div className="neu-pill" style={{
-          borderRadius: 32, height: 64,
+          borderRadius: 'calc(var(--sz-radius) * 1.333)', height: 64,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 10px 0 22px',
         }}>
           <div>
-            <div style={{ fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
+            <div style={{ fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1, fontFamily: 'Inter, sans-serif', fontWeight: 600, marginBottom: 2 }}>
               SHOP
             </div>
-            <div className="serif" style={{ fontSize: 17, fontWeight: 500, color: 'var(--p-ink)' }}>
+            <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 0.944)', fontWeight: 500, color: 'var(--p-ink)' }}>
               {storeLabel || '커피기술 마켓가기'}
             </div>
           </div>
             <div style={{
-              width: 48, height: 48, borderRadius: 24,
+              width: 48, height: 48, borderRadius: 'var(--sz-radius)',
               background: 'var(--p-ink)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: '3px 3px 8px rgba(0,0,0,0.2)',

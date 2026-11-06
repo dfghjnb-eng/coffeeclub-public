@@ -1,6 +1,8 @@
 import { supabase, Coffee, getSiteSettings } from '@/lib/supabase'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import RoastCode from '@/components/RoastCode'
+import { roastInfo } from '@/lib/roast'
 import QRSection from '@/components/QRSection'
 import VisitTracker from '@/components/VisitTracker'
 import DetailTabs from '@/components/DetailTabs'
@@ -34,7 +36,7 @@ function OriginFlag({ origin }: { origin: string }) {
   if (o.includes('르완다')    || o.includes('rwanda'))       return <>🇷🇼</>
   if (o.includes('엘살바도르') || o.includes('el salvador')) return <>🇸🇻</>
   return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#888578" strokeWidth="1.6" strokeLinecap="round">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--p-muted)" strokeWidth="1.6" strokeLinecap="round">
       <ellipse cx="12" cy="12" rx="6.5" ry="9" transform="rotate(-25 12 12)"/>
       <path d="M9 5.5C9 9.5 14 13.5 15 18.5" transform="rotate(-25 12 12)"/>
     </svg>
@@ -46,6 +48,7 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
   const [coffee, settings] = await Promise.all([getCoffee(id), getSiteSettings()])
   if (!coffee) notFound()
 
+  const roast      = roastInfo(coffee.extraction_guide?.roast)
   const storeUrl   = settings['store_url']        || ''
   const storeLabel = settings['store_label']      || '커피기술 마켓가기'
   const storeBg    = settings['store_color']      || '#03C75A'
@@ -64,10 +67,10 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
         }}>
           <Link href="/" style={{ textDecoration: 'none' }}>
             <div className="neu-sm" style={{
-              width: 42, height: 42, borderRadius: 21,
+              width: 42, height: 42, borderRadius: 'calc(var(--sz-radius) * 0.875)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--p-ink)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M19 12H5M11 18l-6-6 6-6"/>
               </svg>
             </div>
@@ -76,32 +79,42 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
         </div>
 
         {/* ── Hero 카드 ── */}
-        <div className="neu" style={{ borderRadius: 28, padding: '20px', marginBottom: 16 }}>
+        <div className="neu" style={{ borderRadius: 'calc(var(--sz-radius) * 1.167)', padding: '20px', marginBottom: 16 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 14 }}>
             {/* 원산지 국기 박스 */}
             <div className="neu-sm" style={{
-              width: 80, height: 80, borderRadius: 22, flexShrink: 0,
+              width: 80, height: 80, borderRadius: 'calc(var(--sz-radius) * 0.917)', flexShrink: 0,
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 40,
+              fontSize: 'calc(var(--sz-hero) * 1.429)',
             }}>
               <OriginFlag origin={coffee.origin ?? ''} />
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
               <div style={{
-                fontSize: 9, color: 'var(--p-muted)', letterSpacing: 1.5,
+                fontSize: 'calc(var(--sz-label) * 0.818)', color: 'var(--p-muted)', letterSpacing: 1.5,
                 marginBottom: 6, fontFamily: 'Inter, sans-serif', fontWeight: 600,
               }}>
                 {coffee.origin?.toUpperCase()}
               </div>
               <h1 className="serif" style={{
-                fontSize: 24, fontWeight: 500, color: 'var(--p-ink)',
+                fontSize: 'calc(var(--sz-name) * 1.333)', fontWeight: 500, color: 'var(--p-ink)',
                 lineHeight: 1.2, letterSpacing: -0.4, margin: '0 0 5px',
               }}>
-                {coffee.name}
+                <RoastCode roast={coffee.extraction_guide?.roast} />{coffee.name}
               </h1>
               {coffee.processing && (
-                <div style={{ fontSize: 12, color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
+                <div style={{ fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)', fontFamily: 'Inter, sans-serif' }}>
                   {coffee.processing}
+                </div>
+              )}
+              {roast && (
+                <div style={{ marginTop: 8, fontFamily: 'Inter, sans-serif', lineHeight: 1.5 }}>
+                  <div style={{ fontSize: 'calc(var(--sz-body) * 0.857)', fontWeight: 600, color: 'var(--p-ink)' }}>
+                    {roast.code} {roast.line} · {roast.label}
+                  </div>
+                  <div style={{ fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)' }}>
+                    {roast.desc}
+                  </div>
                 </div>
               )}
             </div>
@@ -112,8 +125,8 @@ export default async function CoffeePage({ params }: { params: Promise<{ id: str
             <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
               {coffee.flavor_notes.split(',').map((t: string) => (
                 <div key={t} className="neu-sm" style={{
-                  padding: '5px 12px', borderRadius: 14,
-                  fontSize: 10, fontWeight: 500, color: 'var(--p-text)',
+                  padding: '5px 12px', borderRadius: 'calc(var(--sz-radius) * 0.583)',
+                  fontSize: 'calc(var(--sz-label) * 0.909)', fontWeight: 500, color: 'var(--p-text)',
                   fontFamily: 'Inter, sans-serif',
                 }}>
                   {t.trim()}

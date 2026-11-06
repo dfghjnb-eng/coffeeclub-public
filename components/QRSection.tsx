@@ -53,14 +53,14 @@ export default function QRSection({ coffeeId, coffeeName }: { coffeeId: string; 
       title="QR 코드 저장"
       style={{
         display: 'flex', alignItems: 'center', gap: 6,
-        padding: '0 14px', height: 42, borderRadius: 21,
+        padding: '0 14px', height: 42, borderRadius: 'calc(var(--sz-radius) * 0.875)',
         border: 'none', cursor: 'pointer', background: 'none',
         transition: 'all 0.18s ease',
       }}
     >
       {/* QR 아이콘 */}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-        stroke={saved ? '#FF7F40' : '#888578'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        stroke={saved ? 'var(--p-accent)' : 'var(--p-muted)'} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="7" height="7" rx="1"/>
         <rect x="14" y="3" width="7" height="7" rx="1"/>
         <rect x="3" y="14" width="7" height="7" rx="1"/>
@@ -68,7 +68,7 @@ export default function QRSection({ coffeeId, coffeeName }: { coffeeId: string; 
       </svg>
       <span style={{
         fontFamily: 'Inter, sans-serif',
-        fontSize: 11, fontWeight: 600,
+        fontSize: 'var(--sz-label)', fontWeight: 600,
         color: saved ? 'var(--p-accent)' : 'var(--p-muted)',
         letterSpacing: 0.5,
         whiteSpace: 'nowrap',
