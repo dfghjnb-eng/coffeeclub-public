@@ -10,6 +10,11 @@ const ZOOM_SIZE = 320           // 원본 크기로 보는 확대 영역(픽셀)
 const STORE_KEY = 'grind_lab_records'
 const KEPT_COLOR = 'rgba(255, 90, 20, 0.8)'
 const CLUMP_COLOR = 'rgba(20, 110, 255, 0.8)'
+const SPLIT_COLOR = 'rgba(250, 190, 0, 0.85)'
+
+function runColor(kind: number) {
+  return kind === 2 ? CLUMP_COLOR : kind === 3 ? SPLIT_COLOR : KEPT_COLOR
+}
 
 type Shot = { canvas: HTMLCanvasElement; width: number; height: number; name: string }
 type GrindRecord = {
@@ -168,7 +173,7 @@ export default function GrindLab() {
         const o = result.overlay
         if (lc) {
           for (let i = 0; i < o.count; i++) {
-            lc.fillStyle = o.kind[i] === 1 ? KEPT_COLOR : CLUMP_COLOR
+            lc.fillStyle = runColor(o.kind[i])
             lc.fillRect(o.x0[i] * k, o.row[i] * k, Math.max(1, (o.x1[i] - o.x0[i] + 1) * k), Math.max(1, k))
           }
         }
@@ -211,7 +216,8 @@ export default function GrindLab() {
         if (y < top) continue
         if (y >= top + ZOOM_SIZE) break
         if (o.x1[i] < left || o.x0[i] >= left + ZOOM_SIZE) continue
-        ctx.fillStyle = o.kind[i] === 1 ? 'rgba(255, 90, 20, 0.45)' : 'rgba(20, 110, 255, 0.45)'
+        ctx.globalAlpha = 0.55
+        ctx.fillStyle = runColor(o.kind[i])
         ctx.fillRect(o.x0[i] - left, y - top, o.x1[i] - o.x0[i] + 1, 1)
       }
     }
@@ -393,7 +399,7 @@ export default function GrindLab() {
                   </div>
                   <div style={NOTE}>구형 1~11 눈금판이면 {ek43DialText(result.d50, EK43_DIALS[1])}</div>
                   <div style={{ ...NOTE, marginTop: 4 }}>
-                    참고값입니다. D50을 Honest Coffee Guide 표로 환산했으며, 실제 눈금은 기계와 버, 0점에 따라 달라집니다.
+                    아직 매장 EK43으로 보정하지 않은 참고값입니다. D50을 Honest Coffee Guide 표로 환산했으며, 실제 눈금과 다를 수 있습니다.
                   </div>
                 </div>
               )}
@@ -403,7 +409,7 @@ export default function GrindLab() {
                   ['D90', umText(result.d90)],
                   ['퍼짐', result.span.toFixed(2)],
                   ['입자 수', result.count.toLocaleString()],
-                  ['뭉침 제외', `${result.clumpCount}개`],
+                  ['뭉침 제외', `${result.clumpCount}개 (${Math.round(result.clumpShare * 100)}%)`],
                   ['1픽셀', `${result.umPerPx.toFixed(1)}μm`],
                 ].map(([name, value]) => (
                   <div key={name}>
@@ -431,7 +437,7 @@ export default function GrindLab() {
               <div style={LABEL}>입자를 제대로 찾았는지 확인</div>
               <label style={{ ...NOTE, display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                 <input type="checkbox" checked={showOverlay} onChange={(e) => setShowOverlay(e.target.checked)} />
-                입자 표시 (주황: 측정, 파랑: 뭉침으로 제외)
+                입자 표시 (주황·노랑: 측정, 색이 다르면 나눈 입자 / 파랑: 뭉쳐서 제외)
               </label>
               <div style={{ ...NOTE, marginBottom: 8 }}>위 사진을 누르면 그 부분을 원본 크기로 보여 줍니다.</div>
               <canvas ref={zoomRef} aria-label="사진 확대 보기" style={{ width: '100%', maxWidth: ZOOM_SIZE, display: 'block', borderRadius: 12, imageRendering: 'pixelated' }} />

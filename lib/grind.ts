@@ -33,6 +33,7 @@ export type GrindOptions = {
   umPerPx: number
   coin?: Circle
   threshold?: number
+  neck?: number
 }
 
 export type HistogramBin = { from: number; to: number; percent: number }
@@ -42,7 +43,7 @@ export type GrindOverlay = {
   row: Int32Array
   x0: Int32Array
   x1: Int32Array
-  kind: Uint8Array // 1 = 측정한 입자, 2 = 뭉침으로 보고 제외
+  kind: Uint8Array // 1·3 = 측정한 입자(나눈 조각끼리 번갈아 표시), 2 = 뭉침으로 보고 제외
 }
 
 export type GrindResult = {
@@ -56,6 +57,7 @@ export type GrindResult = {
   coverage: number
   clumpCount: number
   clumpShare: number
+  splitCount: number // 닿은 입자로 보고 나눈 덩어리 수
   tooSmallCount: number
   histogram: HistogramBin[]
   warnings: string[]
@@ -69,6 +71,9 @@ const CLUMP_UM = 2500                 // 굵은 분쇄보다도 큰 덩어리는
 const CLUMP_FILL = 0.35               // 외곽 사각형을 이 비율도 못 채우면 입자가 이어진 모양이다
 const COIN_MARGIN = 1.12              // 동전 그림자까지 빼려고 원보다 조금 넓게 제외한다
 const EDGE_PX = 2
+const SPLIT_MIN_PX = 40               // 이보다 작은 덩어리는 나누지 않는다
+const SPLIT_NECK = 0.8                // 잘록한 곳이 작은 쪽 봉우리의 이 비율보다 좁으면 닿은 입자로 본다
+const SPLIT_MIN_PIECE_PX = 12         // 이보다 작은 조각은 옆 조각에 합친다
 
 function luminance(data: Uint8ClampedArray, width: number, height: number) {
   const n = width * height
@@ -196,6 +201,109 @@ function findComponents(state: Uint8Array, width: number, height: number) {
   return { n, row, x0, x1, bad, find }
 }
 
+type Piece = { area: number; width: number; height: number; runs: number[] } // runs: row, x0, x1 반복
+
+/* 한 덩어리를 거리 지도로 나눈다. 안쪽 깊이의 봉우리를 입자로 보고, 봉우리 사이가 충분히 잘록할 때만 가른다.
+   둘레가 울퉁불퉁한 한 알이 쪼개지지 않도록 얕은 골짜기는 합친다. */
+function splitComponent(
+  runIds: number[], row: Int32Array, x0: Int32Array, x1: Int32Array,
+  box: { minX: number; maxX: number; minY: number; maxY: number }, neck: number,
+): Piece[] {
+  const left = box.minX - 1, top = box.minY - 1
+  const w = box.maxX - box.minX + 3, h = box.maxY - box.minY + 3
+  const mask = new Uint8Array(w * h)
+  const dist = new Int32Array(w * h)
+  const pixels: number[] = []
+  const FAR = 1 << 28
+  for (const i of runIds) {
+    const start = (row[i] - top) * w - left
+    for (let x = x0[i]; x <= x1[i]; x++) { mask[start + x] = 1; dist[start + x] = FAR; pixels.push(start + x) }
+  }
+  // 3-4 체임퍼 거리: 곧은 방향 3, 대각선 4
+  for (let y = 1; y < h - 1; y++) for (let x = 1; x < w - 1; x++) {
+    const p = y * w + x
+    if (mask[p]) dist[p] = Math.min(dist[p], dist[p - 1] + 3, dist[p - w] + 3, dist[p - w - 1] + 4, dist[p - w + 1] + 4)
+  }
+  for (let y = h - 2; y > 0; y--) for (let x = w - 2; x > 0; x--) {
+    const p = y * w + x
+    if (mask[p]) dist[p] = Math.min(dist[p], dist[p + 1] + 3, dist[p + w] + 3, dist[p + w + 1] + 4, dist[p + w - 1] + 4)
+  }
+
+  const label = new Int32Array(w * h) // 0 = 아직 없음
+  const parent: number[] = [0], peak: number[] = [0]
+  const find = (a: number) => {
+    while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a] }
+    return a
+  }
+  const around = [-w - 1, -w, -w + 1, -1, 1, w - 1, w, w + 1]
+  pixels.sort((a, b) => dist[b] - dist[a])
+  for (const p of pixels) {
+    let best = 0
+    const roots: number[] = []
+    for (const d of around) {
+      const l = label[p + d]
+      if (!l) continue
+      const r = find(l)
+      if (!roots.includes(r)) roots.push(r)
+      if (!best || peak[r] > peak[best]) best = r
+    }
+    if (!best) {
+      best = parent.length
+      parent.push(best); peak.push(dist[p])
+    } else {
+      for (const r of roots) {
+        if (r !== best && dist[p] >= neck * Math.min(peak[r], peak[best])) parent[r] = best
+      }
+    }
+    label[p] = best
+  }
+
+  // 작은 조각은 가장 많이 닿은 옆 조각에 합친다
+  const areaOf = new Map<number, number>()
+  for (const p of pixels) { const r = find(label[p]); areaOf.set(r, (areaOf.get(r) ?? 0) + 1) }
+  for (const [root, size] of [...areaOf.entries()].sort((a, b) => a[1] - b[1])) {
+    if (size >= SPLIT_MIN_PIECE_PX || areaOf.size < 2) continue
+    const votes = new Map<number, number>()
+    for (const p of pixels) {
+      if (find(label[p]) !== root) continue
+      for (const d of around) {
+        const l = label[p + d]
+        if (!l) continue
+        const r = find(l)
+        if (r !== root) votes.set(r, (votes.get(r) ?? 0) + 1)
+      }
+    }
+    const target = [...votes.entries()].sort((a, b) => b[1] - a[1])[0]
+    if (target) { parent[root] = target[0]; areaOf.set(target[0], (areaOf.get(target[0]) ?? 0) + size); areaOf.delete(root) }
+  }
+
+  // 조각별 면적·크기·가로 구간
+  const pieces = new Map<number, Piece & { minX: number; maxX: number; minY: number; maxY: number }>()
+  for (let y = 1; y < h - 1; y++) {
+    let x = 1
+    while (x < w - 1) {
+      const p = y * w + x
+      if (!mask[p]) { x++; continue }
+      const root = find(label[p])
+      let end = x
+      while (end + 1 < w - 1 && mask[y * w + end + 1] && find(label[y * w + end + 1]) === root) end++
+      let piece = pieces.get(root)
+      if (!piece) {
+        piece = { area: 0, width: 0, height: 0, runs: [], minX: x, maxX: end, minY: y, maxY: y }
+        pieces.set(root, piece)
+      }
+      piece.area += end - x + 1
+      piece.minX = Math.min(piece.minX, x); piece.maxX = Math.max(piece.maxX, end); piece.maxY = y
+      piece.runs.push(y + top, x + left, end + left)
+      x = end + 1
+    }
+  }
+  return [...pieces.values()].map((piece) => ({
+    area: piece.area, runs: piece.runs,
+    width: piece.maxX - piece.minX + 1, height: piece.maxY - piece.minY + 1,
+  }))
+}
+
 function weightedQuantile(values: Float64Array, weights: Float64Array, total: number, q: number) {
   const target = total * q
   let sum = 0
@@ -257,24 +365,44 @@ export function analyzeGrind(
     if (bad[i]) blocked[k] = 1
   }
 
-  // 분류: 동전·가장자리에 닿은 덩어리는 잘렸을 수 있어 세지 않는다
-  const kindOf = new Uint8Array(area.length)
+  // 덩어리별 구간 목록
+  const head = new Int32Array(area.length).fill(-1), next = new Int32Array(n)
+  for (let i = n - 1; i >= 0; i--) { next[i] = head[roots[i]]; head[roots[i]] = i }
+
+  // 동전·가장자리에 닿은 덩어리는 잘렸을 수 있어 세지 않는다. 나머지는 닿은 입자를 나눈 뒤 분류한다
+  const neck = options.neck ?? SPLIT_NECK
   const sizes: number[] = []
-  let clumpVolume = 0, tooSmallCount = 0, clumpCount = 0
+  const shown: number[] = [] // row, x0, x1, kind 반복
+  let clumpVolume = 0, tooSmallCount = 0, clumpCount = 0, splitCount = 0
   for (let k = 0; k < area.length; k++) {
     if (blocked[k]) continue
-    const px = 2 * Math.sqrt(area[k] / Math.PI)
-    if (px < MIN_DIAMETER_PX) { tooSmallCount++; continue }
-    const um = px * umPerPx
-    const fill = area[k] / ((maxX[k] - minX[k] + 1) * (maxY[k] - minY[k] + 1))
-    if (um > CLUMP_UM || (fill < CLUMP_FILL && px > MIN_DIAMETER_PX * 4)) {
-      kindOf[k] = 2
-      clumpCount++
-      clumpVolume += um ** 3
-      continue
+    const runIds: number[] = []
+    for (let i = head[k]; i !== -1; i = next[i]) runIds.push(i)
+    let pieces: Piece[]
+    if (area[k] >= SPLIT_MIN_PX) {
+      pieces = splitComponent(runIds, row, x0, x1, { minX: minX[k], maxX: maxX[k], minY: minY[k], maxY: maxY[k] }, neck)
+    } else {
+      pieces = [{
+        area: area[k], width: maxX[k] - minX[k] + 1, height: maxY[k] - minY[k] + 1,
+        runs: runIds.flatMap((i) => [row[i], x0[i], x1[i]]),
+      }]
     }
-    kindOf[k] = 1
-    sizes.push(um)
+    if (pieces.length > 1) splitCount++
+    pieces.forEach((piece, index) => {
+      const px = 2 * Math.sqrt(piece.area / Math.PI)
+      if (px < MIN_DIAMETER_PX) { tooSmallCount++; return }
+      const um = px * umPerPx
+      const fill = piece.area / (piece.width * piece.height)
+      let kind = index % 2 ? 3 : 1
+      if (um > CLUMP_UM || (fill < CLUMP_FILL && px > MIN_DIAMETER_PX * 4)) {
+        kind = 2
+        clumpCount++
+        clumpVolume += um ** 3
+      } else {
+        sizes.push(um)
+      }
+      for (let i = 0; i < piece.runs.length; i += 3) shown.push(piece.runs[i], piece.runs[i + 1], piece.runs[i + 2], kind)
+    })
   }
 
   // 체나 레이저 측정처럼 부피 기준으로 낸다. 입자 수로 세면 작은 먼지가 값을 끌어내린다.
@@ -292,30 +420,28 @@ export function analyzeGrind(
   const span = d50 ? (d90 - d10) / d50 : 0
   const clumpShare = totalVolume + clumpVolume ? clumpVolume / (totalVolume + clumpVolume) : 0
 
-  // 화면에 입자를 칠할 때 쓰는 구간 목록. row 순서로 정렬돼 있다
-  let kept = 0
-  for (let i = 0; i < n; i++) if (kindOf[roots[i]]) kept++
+  // 화면에 입자를 칠할 때 쓰는 구간 목록. 확대 보기가 row 순서에 기대므로 정렬한다
+  const kept = shown.length / 4
+  const order = Array.from({ length: kept }, (_, i) => i).sort((a, b) => shown[a * 4] - shown[b * 4])
   const overlay: GrindOverlay = {
     count: kept,
     row: new Int32Array(kept), x0: new Int32Array(kept), x1: new Int32Array(kept), kind: new Uint8Array(kept),
   }
-  for (let i = 0, j = 0; i < n; i++) {
-    const kind = kindOf[roots[i]]
-    if (!kind) continue
-    overlay.row[j] = row[i]; overlay.x0[j] = x0[i]; overlay.x1[j] = x1[i]; overlay.kind[j] = kind
-    j++
-  }
+  order.forEach((from, to) => {
+    overlay.row[to] = shown[from * 4]; overlay.x0[to] = shown[from * 4 + 1]
+    overlay.x1[to] = shown[from * 4 + 2]; overlay.kind[to] = shown[from * 4 + 3]
+  })
 
   const warnings: string[] = []
   if (umPerPx > 40) warnings.push('너무 멀리서 찍었거나 해상도가 낮습니다. 더 가까이에서 다시 찍어 주세요.')
   if (diameters.length < 300) warnings.push(`입자가 ${diameters.length}개뿐입니다. 300개 이상이어야 값이 안정적입니다.`)
-  if (coverage > 0.3) warnings.push('가루가 너무 많습니다. 입자가 서로 닿지 않게 더 얇게 펴 주세요.')
-  if (clumpShare > 0.1) warnings.push('뭉친 입자가 많아 제외했습니다. 더 얇게 펴 주세요.')
+  if (coverage > 0.1) warnings.push('가루가 많아 입자가 겹쳤을 수 있습니다. 값이 실제보다 크게 나옵니다. 더 얇게 펴 주세요.')
+  if (clumpShare > 0.1) warnings.push('뭉친 가루가 많아 제외했습니다. 뭉친 곳을 흩어서 다시 찍으면 값이 더 정확합니다.')
   if (d50 && d50 / umPerPx < 12) warnings.push('입자가 사진 해상도에 비해 작아 값을 믿기 어렵습니다. 더 가까이에서 찍어 주세요.')
 
   return {
     umPerPx, threshold, count: diameters.length,
-    d10, d50, d90, span, coverage, clumpCount, clumpShare, tooSmallCount,
+    d10, d50, d90, span, coverage, clumpCount, clumpShare, splitCount, tooSmallCount,
     histogram: buildHistogram(diameters, weights, totalVolume),
     warnings, overlay,
     ms: Date.now() - startedAt,
