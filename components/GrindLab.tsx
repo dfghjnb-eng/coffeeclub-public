@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, EK43_SOURCE_URL, ek43DialText } from '@/lib/grind'
+import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, EK43_SOURCE_URL, comandanteClickText, ek43DialText } from '@/lib/grind'
 import type { Circle, GrindResult, HistogramBin } from '@/lib/grind'
 
 const MAX_PIXELS = 16_000_000   // 아이폰 사파리 캔버스 한도
@@ -19,7 +19,7 @@ function runColor(kind: number) {
 type Shot = { canvas: HTMLCanvasElement; width: number; height: number; name: string }
 type GrindRecord = {
   label: string; d10: number; d50: number; d90: number; span: number; count: number; umPerPx: number; photo: string
-  ek16?: string; ek11?: string // 이 항목을 넣기 전에 저장한 기록에는 없다
+  ek16?: string; ek11?: string; comandante?: string // 이 항목들을 넣기 전에 저장한 기록에는 없다
 }
 
 const CARD: CSSProperties = { borderRadius: 'var(--sz-radius)', padding: 18, marginBottom: 14 }
@@ -275,6 +275,7 @@ export default function GrindLab() {
       span: Math.round(result.span * 100) / 100, count: result.count,
       umPerPx: Math.round(result.umPerPx * 10) / 10, photo: shot.name,
       ek16: ek43DialText(result.d50, EK43_DIALS[0]), ek11: ek43DialText(result.d50, EK43_DIALS[1]),
+      comandante: comandanteClickText(result.d50),
     }]
     setRecords(next); writeRecords(next); setLabel('')
   }
@@ -285,8 +286,8 @@ export default function GrindLab() {
   }
 
   async function copyRecords() {
-    const header = '설정\tD10\tD50\tD90\t퍼짐\t입자수\t1픽셀(μm)\t말코닉 참고(0~16)\t말코닉 참고(1~11)\t사진'
-    const rows = records.map((r) => [r.label, r.d10, r.d50, r.d90, r.span, r.count, r.umPerPx, r.ek16 ?? '', r.ek11 ?? '', r.photo].join('\t'))
+    const header = '설정\tD10\tD50\tD90\t퍼짐\t입자수\t1픽셀(μm)\t말코닉 참고(0~16)\t말코닉 참고(1~11)\t코만단테 참고\t사진'
+    const rows = records.map((r) => [r.label, r.d10, r.d50, r.d90, r.span, r.count, r.umPerPx, r.ek16 ?? '', r.ek11 ?? '', r.comandante ?? '', r.photo].join('\t'))
     try {
       await navigator.clipboard.writeText([header, ...rows].join('\n'))
       setCopied(true)
@@ -398,8 +399,11 @@ export default function GrindLab() {
                     말코닉 EK43 기준 {ek43DialText(result.d50, EK43_DIALS[0])}
                   </div>
                   <div style={NOTE}>구형 1~11 눈금판이면 {ek43DialText(result.d50, EK43_DIALS[1])}</div>
+                  <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 1.143)', fontWeight: 600, color: 'var(--p-ink)', marginTop: 6 }}>
+                    코만단테 C40 기준 {comandanteClickText(result.d50)}
+                  </div>
                   <div style={{ ...NOTE, marginTop: 4 }}>
-                    참고값입니다. <a href={EK43_SOURCE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Onyx Coffee Lab</a>의 EK43 측정 자료로 환산했고, 매장 EK43 눈금 9 측정 1건으로 임시 보정했습니다. 다른 눈금은 아직 검증하지 않았으며, 정밀도는 ±1 정도입니다.
+                    참고값입니다. <a href={EK43_SOURCE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Onyx Coffee Lab</a>의 EK43 측정 자료로 환산했고, 매장 EK43 눈금 9 측정 1건으로 임시 보정했습니다. 다른 눈금은 아직 검증하지 않았으며, 말코닉 정밀도는 ±1 정도입니다. 코만단테는 측정 자료가 많이 흔들려 ±5클릭으로 보아 주세요. 레드클릭스는 숫자가 약 2배입니다.
                   </div>
                 </div>
               )}
@@ -460,7 +464,7 @@ export default function GrindLab() {
               <table style={{ width: '100%', borderCollapse: 'collapse', fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-ink)' }}>
                 <thead>
                   <tr style={{ color: 'var(--p-muted)', textAlign: 'left' }}>
-                    {['설정', 'D50', '말코닉', '구형 눈금', 'D10', 'D90', '퍼짐', '입자'].map((h) =><th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
+                    {['설정', 'D50', '말코닉', '구형 눈금', '코만단테', 'D10', 'D90', '퍼짐', '입자'].map((h) =><th key={h} style={{ padding: '6px 8px 6px 0', fontWeight: 500, whiteSpace: 'nowrap' }}>{h}</th>)}
                   </tr>
                 </thead>
                 <tbody>
@@ -470,6 +474,7 @@ export default function GrindLab() {
                       <td style={{ padding: '6px 8px 6px 0', fontWeight: 600 }}>{r.d50}</td>
                       <td style={{ padding: '6px 8px 6px 0', whiteSpace: 'nowrap' }}>{r.ek16 ?? '-'}</td>
                       <td style={{ padding: '6px 8px 6px 0', whiteSpace: 'nowrap' }}>{r.ek11 ?? '-'}</td>
+                      <td style={{ padding: '6px 8px 6px 0', whiteSpace: 'nowrap' }}>{r.comandante ?? '-'}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.d10}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.d90}</td>
                       <td style={{ padding: '6px 8px 6px 0' }}>{r.span}</td>

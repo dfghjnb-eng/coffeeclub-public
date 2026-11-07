@@ -38,6 +38,23 @@ export function ek43DialText(um: number, dial: { scale: (dial: number) => number
   return `약 ${Math.round(dial.scale(value))}`
 }
 
+/* 코만단테 C40 참고 클릭. Onyx 회귀식: μm = 372.34 × e^(0.0287 × (클릭 - 1)) (DiFluid Omni).
+   측정값이 곡선에서 평균 107μm 벗어나 ±5클릭보다 좁게 말할 수 없다.
+   1~18클릭은 400~530μm 로 평평하고, 28클릭부터는 값이 오히려 줄어 양 끝은 구분하지 않는다.
+   기본 축인지 레드클릭스인지 자료에 없다. D50 을 곡선에 넣는 비율은 EK43 에서 정한 값을 같이 쓴다.
+   매장 코만단테를 재면 그 값으로 바꿀 것. */
+const COMANDANTE_CURVE_A = 372.34
+const COMANDANTE_CURVE_K = 0.0287
+const COMANDANTE_FLAT_BELOW = 18
+const COMANDANTE_TOP = 30
+
+export function comandanteClickText(um: number) {
+  const click = Math.log(um / EK43_D50_RATIO / COMANDANTE_CURVE_A) / COMANDANTE_CURVE_K + 1
+  if (click <= COMANDANTE_FLAT_BELOW) return `${COMANDANTE_FLAT_BELOW}클릭 이하 (구분 어려움)`
+  if (click >= COMANDANTE_TOP) return `${COMANDANTE_TOP}클릭 이상 (구분 어려움)`
+  return `약 ${Math.round(click)}클릭 (±5)`
+}
+
 export type GrindOptions = {
   umPerPx: number
   coin?: Circle
