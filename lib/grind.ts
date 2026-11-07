@@ -14,10 +14,13 @@ export type Circle = { x: number; y: number; r: number }
 /* EK43 참고 눈금. 매장 기계를 잰 값이 아니라 공개 자료로 환산한 값이다.
    Onyx Coffee Lab Grind Calculator 의 EK43(0~16) 측정 곡선: μm = 396.01 × e^(0.057 × 눈금) (DiFluid Omni).
    눈금 0~4 는 측정값이 430~480μm 로 거의 평평해 구분할 수 없고, 이웃 눈금끼리 흔들려 정밀도는 ±1 정도다.
-   이 페이지의 D50 은 Onyx 값보다 크게 나온다(눈금 9에서 약 1.55배). 매장 EK43 실측으로 보정할 때까지 참고용이다.
+   이 페이지의 D50 은 Onyx 값보다 크게 나와서 곡선에 넣기 전에 EK43_D50_RATIO 로 나눈다.
+   이 비율은 매장 EK43 눈금 9 측정 1건에서 정한 임시값이다: 휴대폰 측정 1,315μm 에 입자 분할 효과(-5%)를 반영한 약 1,249μm ÷ 곡선의 눈금 9 값 661μm.
+   그래서 눈금 9 는 맞도록 정해져 있고, 다른 눈금은 아직 검증하지 않았다. 눈금별 측정이 쌓이면 다시 정할 것.
    구형 1~11 눈금판은 Honest Coffee Guide 의 두 눈금판 표가 보여 주는 관계(구형 = 1 + 눈금 × 10/16)로 바꾼다. */
 const EK43_CURVE_A = 396.01
 const EK43_CURVE_K = 0.057
+const EK43_D50_RATIO = 1.89
 const EK43_FLAT_BELOW = 4
 const EK43_TOP = 16
 export const EK43_DIALS = [
@@ -28,7 +31,7 @@ export const EK43_DIALS = [
 export const EK43_SOURCE_URL = 'https://onyxcoffeelab.com/pages/grind-size-calculator'
 
 export function ek43DialText(um: number, dial: { scale: (dial: number) => number }) {
-  const value = Math.log(um / EK43_CURVE_A) / EK43_CURVE_K
+  const value = Math.log(um / EK43_D50_RATIO / EK43_CURVE_A) / EK43_CURVE_K
   const show = (d: number) => Math.round(dial.scale(d) * 2) / 2
   if (value <= EK43_FLAT_BELOW) return `${show(EK43_FLAT_BELOW)} 이하 (구분 어려움)`
   if (value >= EK43_TOP) return `${show(EK43_TOP)} 이상`
