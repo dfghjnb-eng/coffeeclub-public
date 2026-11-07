@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
-import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, EK43_SOURCE_URL, comandanteClickText, ek43DialText } from '@/lib/grind'
+import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, comandanteClickText, ek43DialText } from '@/lib/grind'
 import type { Circle, GrindResult, HistogramBin } from '@/lib/grind'
 
 const MAX_PIXELS = 16_000_000   // 아이폰 사파리 캔버스 한도
@@ -103,7 +103,7 @@ function DistributionChart({ bins, d50 }: { bins: HistogramBin[]; d50: number })
   )
 }
 
-/* 내부 테스트용 분쇄도 측정 화면. 사진은 이 브라우저 안에서만 처리하고 어디로도 보내지 않는다. */
+/* 분쇄도 측정 화면. 사진은 이 브라우저 안에서만 처리하고 어디로도 보내지 않는다. */
 export default function GrindLab() {
   const [shot, setShot] = useState<Shot | null>(null)
   const [coin, setCoin] = useState<Circle | null>(null)
@@ -308,7 +308,7 @@ export default function GrindLab() {
       <div style={{ maxWidth: 640, margin: '0 auto', padding: '24px 20px 140px' }}>
         <div className="serif" style={{ fontSize: 'calc(var(--sz-name) * 1.111)', fontWeight: 600, color: 'var(--p-ink)' }}>분쇄도 측정</div>
         <div style={{ ...NOTE, marginBottom: 16 }}>
-          내부 테스트용 시제품입니다. 메뉴에는 없는 페이지이고, 사진은 이 브라우저 안에서만 처리됩니다.
+          원두 가루 사진으로 입자 크기를 재 봅니다. 사진은 이 브라우저 안에서만 처리되고 어디로도 전송되지 않습니다.
         </div>
 
         <div className="neu" style={CARD}>
@@ -407,7 +407,7 @@ export default function GrindLab() {
                     코만단테 C40 기준 {comandanteClickText(result.d50)}
                   </div>
                   <div style={{ ...NOTE, marginTop: 4 }}>
-                    참고값입니다. <a href={EK43_SOURCE_URL} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>Onyx Coffee Lab</a>의 EK43 측정 자료로 환산했고, 매장 EK43 눈금 9 측정 1건으로 임시 보정했습니다. 다른 눈금은 아직 검증하지 않았으며, 말코닉 정밀도는 ±1 정도입니다. 코만단테는 측정 자료가 많이 흔들려 ±5클릭으로 보아 주세요. 레드클릭스는 숫자가 약 2배입니다.
+                    정확한 값이 아니니 참고용으로 사용해 주세요.
                   </div>
                 </div>
               )}

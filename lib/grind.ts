@@ -12,7 +12,7 @@ export const COINS = [
 export type Circle = { x: number; y: number; r: number }
 
 /* EK43 참고 눈금. 매장 기계를 잰 값이 아니라 공개 자료로 환산한 값이다.
-   Onyx Coffee Lab Grind Calculator 의 EK43(0~16) 측정 곡선: μm = 396.01 × e^(0.057 × 눈금) (DiFluid Omni).
+   Onyx Coffee Lab Grind Calculator(onyxcoffeelab.com/pages/grind-size-calculator) 의 EK43(0~16) 측정 곡선: μm = 396.01 × e^(0.057 × 눈금) (DiFluid Omni).
    눈금 0~4 는 측정값이 430~480μm 로 거의 평평해 구분할 수 없고, 이웃 눈금끼리 흔들려 정밀도는 ±1 정도다.
    이 페이지의 D50 은 Onyx 값보다 크게 나와서 곡선에 넣기 전에 EK43_D50_RATIO 로 나눈다.
    이 비율은 매장 EK43 눈금 9 측정 1건에서 정한 임시값이다: 휴대폰 측정 1,315μm 에 입자 분할 효과(-5%)를 반영한 약 1,249μm ÷ 곡선의 눈금 9 값 661μm.
@@ -27,8 +27,6 @@ export const EK43_DIALS = [
   { key: 'ek16', label: '0~16 눈금판', scale: (dial: number) => dial },
   { key: 'ek11', label: '1~11 눈금판', scale: (dial: number) => 1 + dial * (10 / 16) },
 ] as const
-
-export const EK43_SOURCE_URL = 'https://onyxcoffeelab.com/pages/grind-size-calculator'
 
 export function ek43DialText(um: number, dial: { scale: (dial: number) => number }) {
   const value = Math.log(um / EK43_D50_RATIO / EK43_CURVE_A) / EK43_CURVE_K
@@ -52,7 +50,7 @@ export function comandanteClickText(um: number) {
   const click = Math.log(um / EK43_D50_RATIO / COMANDANTE_CURVE_A) / COMANDANTE_CURVE_K + 1
   if (click <= COMANDANTE_FLAT_BELOW) return `${COMANDANTE_FLAT_BELOW}클릭 이하 (구분 어려움)`
   if (click >= COMANDANTE_TOP) return `${COMANDANTE_TOP}클릭 이상 (구분 어려움)`
-  return `약 ${Math.round(click)}클릭 (±5)`
+  return `약 ${Math.round(click)}클릭`
 }
 
 export type GrindOptions = {

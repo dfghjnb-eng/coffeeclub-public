@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import GrindLab from '@/components/GrindLab'
 
-// 내부 테스트용. 메뉴에서 연결하지 않고 검색에도 잡히지 않게 한다.
+// 상단 바로가기 메뉴에서 연결한다. 참고용 도구라 검색에는 잡히지 않게 둔다.
 export const metadata: Metadata = {
-  title: '분쇄도 측정 시제품',
+  title: '분쇄도 측정',
   robots: { index: false, follow: false },
 }
 

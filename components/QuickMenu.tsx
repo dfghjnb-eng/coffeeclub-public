@@ -17,7 +17,7 @@ const icon = (children: ReactNode) => (
   </svg>
 )
 
-/* 홈 상단 오른쪽 바로가기 메뉴: 검색, 타이머 PRO, 네이버 스토어 */
+/* 홈 상단 오른쪽 바로가기 메뉴: 검색, 타이머 PRO, 분쇄도 측정, 네이버 스토어 */
 export default function QuickMenu({ storeUrl }: { storeUrl?: string }) {
   const [open, setOpen] = useState(false)
   const root = useRef<HTMLDivElement>(null)
@@ -74,6 +74,10 @@ export default function QuickMenu({ storeUrl }: { storeUrl?: string }) {
           <Link href="/timer" onClick={close} style={ROW}>
             {icon(<><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5"/><path d="M9 2h6M12 2v2"/></>)}
             타이머 PRO
+          </Link>
+          <Link href="/lab/grind" onClick={close} style={ROW}>
+            {icon(<><circle cx="7" cy="8" r="3"/><circle cx="16.5" cy="7" r="2"/><circle cx="16" cy="15.5" r="3.5"/><circle cx="7.5" cy="17" r="1.5"/></>)}
+            분쇄도 측정
           </Link>
           {storeUrl && (
             <a href={storeUrl} target="_blank" rel="noopener noreferrer" onClick={close} style={ROW}>
