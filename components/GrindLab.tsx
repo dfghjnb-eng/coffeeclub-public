@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import { analyzeGrind, COINS, DEFAULT_THRESHOLD, EK43_DIALS, comandanteClickText, ek43DialText } from '@/lib/grind'
 import type { Circle, GrindResult, HistogramBin } from '@/lib/grind'
+import GrindGuide from '@/components/GrindGuide'
 
 const MAX_PIXELS = 16_000_000   // 아이폰 사파리 캔버스 한도
 const VIEW_WIDTH = 1000         // 화면 캔버스의 내부 폭
@@ -117,6 +118,7 @@ export default function GrindLab() {
   const [label, setLabel] = useState('')
   const [records, setRecords] = useState<GrindRecord[]>([])
   const [copied, setCopied] = useState(false)
+  const [guideOpen, setGuideOpen] = useState(true)
 
   const viewRef = useRef<HTMLCanvasElement>(null)
   const zoomRef = useRef<HTMLCanvasElement>(null)
@@ -149,6 +151,7 @@ export default function GrindLab() {
       setShot({ canvas, width: canvas.width, height: canvas.height, name: file.name })
       const short = Math.min(canvas.width, canvas.height)
       setCoin({ x: short * 0.2, y: short * 0.2, r: short * 0.12 })
+      setGuideOpen(false)
     } catch {
       setError('사진을 열지 못했습니다. JPG나 PNG로 다시 시도해 주세요. (HEIC는 일부 브라우저에서 열리지 않습니다)')
     } finally {
@@ -311,13 +314,10 @@ export default function GrindLab() {
           원두 가루 사진으로 입자 크기를 재 봅니다. 사진은 이 브라우저 안에서만 처리되고 어디로도 전송되지 않습니다.
         </div>
 
+        <GrindGuide open={guideOpen} onToggle={() => setGuideOpen((v) => !v)} />
+
         <div className="neu" style={CARD}>
-          <div style={LABEL}>1. 사진 찍기</div>
-          <ol style={{ ...NOTE, margin: '0 0 14px', paddingLeft: 18 }}>
-            <li>흰 종이에 가루를 조금만, 입자가 서로 닿지 않게 얇게 펴 주세요.</li>
-            <li>가루 옆에 동전을 놓아 주세요.</li>
-            <li>그림자 없이 밝은 곳에서, 종이가 화면을 채우도록 바로 위에서 수평으로 찍어 주세요.</li>
-          </ol>
+          <div style={LABEL}>사진 올리기</div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <label style={{ ...PRIMARY, display: 'block' }}>
               사진 찍기
@@ -334,7 +334,7 @@ export default function GrindLab() {
 
         {shot && (
           <div className="neu" style={CARD}>
-            <div style={LABEL}>{result ? '측정 결과 사진' : '2. 빨간 원을 동전에 맞추기'}</div>
+            <div style={LABEL}>{result ? '측정 결과 사진' : '빨간 원을 동전에 맞춰 주세요'}</div>
             <canvas
               ref={viewRef}
               aria-label={result ? '측정 결과 사진. 누르면 그 부분을 확대합니다' : '사진. 끌어서 원을 동전으로 옮깁니다'}

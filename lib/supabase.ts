@@ -32,6 +32,7 @@ export type Coffee = {
   extraction_guide: {
     roast?: string        // 원두 이름 앞 표기 (light·medium·dark)
     guide_roast?: string  // 이 추출가이드 수치의 기준 로스팅
+    grind_ek43?: number   // 시작 분쇄 눈금 (말코닉 EK43 0~16)
     recipe?: { id: string; name: string; title: string; source: string }
     drip: {
       coffee_amount?: string; water_amount?: string

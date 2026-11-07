@@ -53,6 +53,27 @@ export function comandanteClickText(um: number) {
   return `약 ${Math.round(click)}클릭`
 }
 
+/* 추출가이드에 보여 줄 분쇄 수치. 측정 화면과 같은 환산식을 써서 숫자를 바로 비교할 수 있게 한다.
+   새 가이드는 서버가 정한 EK43 눈금을, 예전 가이드는 분쇄도 글의 μm(AI 추정값)를 눈금으로 바꿔 쓴다. */
+export function grindTargetNumbers(ek43?: number | null, grindText?: string | null) {
+  let dial = typeof ek43 === 'number' ? ek43 : null
+  if (dial === null) {
+    const m = String(grindText ?? '').match(/(\d{3,4})(?:\s*[~\-–]\s*(\d{3,4}))?\s*(?:μm|µm|㎛|um|미크론|마이크론)/i)
+    if (m) {
+      const um = m[2] ? (Number(m[1]) + Number(m[2])) / 2 : Number(m[1])
+      dial = Math.log(um / EK43_CURVE_A) / EK43_CURVE_K
+    }
+  }
+  if (dial === null || !Number.isFinite(dial)) return null
+  dial = Math.max(EK43_FLAT_BELOW, Math.min(EK43_TOP, dial))
+  const onyxUm = EK43_CURVE_A * Math.exp(EK43_CURVE_K * dial)
+  return {
+    ek43: Math.round(dial),
+    comandante: Math.max(1, Math.round(Math.log(onyxUm / COMANDANTE_CURVE_A) / COMANDANTE_CURVE_K + 1)),
+    d50: Math.round((onyxUm * EK43_D50_RATIO) / 10) * 10,
+  }
+}
+
 export type GrindOptions = {
   umPerPx: number
   coin?: Circle

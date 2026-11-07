@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Link from 'next/link'
 import { roastInfo } from '@/lib/roast'
+import { grindTargetNumbers } from '@/lib/grind'
 
 const FUTURA = "'Futura', 'Century Gothic', 'Trebuchet MS', sans-serif"
 
@@ -230,7 +232,7 @@ function Stopwatch() {
 
 const TAB_ORDER_EG: Array<'drip' | 'esp'> = ['drip', 'esp']
 
-export default function ExtractionGuide({ drip, esp, guideRoast }: { drip: DripGuide; esp: EspGuide; guideRoast?: string }) {
+export default function ExtractionGuide({ drip, esp, guideRoast, grindEk43 }: { drip: DripGuide; esp: EspGuide; guideRoast?: string; grindEk43?: number }) {
   const [tab, setTab] = useState<'drip' | 'esp'>('drip')
   const [dir, setDir] = useState<'right' | 'left'>('right')
   const [animKey, setAnimKey] = useState(0)
@@ -244,6 +246,7 @@ export default function ExtractionGuide({ drip, esp, guideRoast }: { drip: DripG
   }
 
   const pourSteps = parsePourSteps(drip.pour_method)
+  const grindNumbers = grindTargetNumbers(grindEk43, drip.grind)
 
   return (
     <div>
@@ -297,6 +300,28 @@ export default function ExtractionGuide({ drip, esp, guideRoast }: { drip: DripG
                 <SubCell label="GRIND" value={drip.grind} />
                 <SubCell label="RATIO" value={drip.ratio} />
                 <SubCell label="TIME"  value={drip.time} />
+              </div>
+
+              {/* 분쇄 수치와 측정 화면 연결 */}
+              <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid rgba(136,133,120,0.15)' }}>
+                {grindNumbers && (
+                  <>
+                    <div style={{ fontFamily: FUTURA, fontSize: 'calc(var(--sz-label) * 0.727)', color: 'var(--p-muted)', letterSpacing: '1.5px', fontWeight: 600, marginBottom: 6 }}>GRIND SETTING</div>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 600, color: 'var(--p-ink)', lineHeight: 1.6 }}>
+                      말코닉 EK43 약 {grindNumbers.ek43} · 코만단테 C40 약 {grindNumbers.comandante}클릭
+                    </div>
+                    <div style={{ fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.857)', color: 'var(--p-muted)', lineHeight: 1.6, marginBottom: 10 }}>
+                      분쇄도 측정 기준 약 {grindNumbers.d50.toLocaleString()}μm · 시작점으로 쓰는 참고값이에요.
+                    </div>
+                  </>
+                )}
+                <Link href="/lab/grind" className="neu-sm" style={{
+                  display: 'block', padding: '11px 14px', textAlign: 'center', textDecoration: 'none',
+                  borderRadius: 'calc(var(--sz-radius) * 0.6)', color: 'var(--p-ink)',
+                  fontFamily: 'Inter, sans-serif', fontSize: 'calc(var(--sz-body) * 0.929)', fontWeight: 600,
+                }}>
+                  내 분쇄도 재 보기 →
+                </Link>
               </div>
             </div>
 

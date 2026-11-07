@@ -149,7 +149,7 @@ export default function DetailTabs({ coffee, storeUrl, storeLabel, storeBg, stor
       {/* ── BREW 탭 ── */}
       {tab === 'brew' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-          <ExtractionGuide drip={drip} esp={esp} guideRoast={coffee.extraction_guide?.guide_roast} />
+          <ExtractionGuide drip={drip} esp={esp} guideRoast={coffee.extraction_guide?.guide_roast} grindEk43={coffee.extraction_guide?.grind_ek43} />
           {/* 타이머 PRO → 단계별 타이머로 이동 */}
           <Link href={`/timer/${coffee.id}`} style={{ textDecoration: 'none' }}>
             <div className="neu-pill" style={{
