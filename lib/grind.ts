@@ -74,7 +74,7 @@ export type GrindResult = {
   ms: number
 }
 
-export const DEFAULT_THRESHOLD = 0.65 // 가루(배경의 약 30%)와 종이의 중간쯤을 경계로 본다
+export const DEFAULT_THRESHOLD = 0.69 // 매장 EK43 실측에서 이 값이 맞게 나왔다 (2026-11-07, 비율 EK43_D50_RATIO 와 함께 쓴다)
 const MIN_DIAMETER_PX = 3             // 이보다 작으면 크기를 잴 수 없어 세지 않는다
 const CLUMP_UM = 2500                 // 굵은 분쇄보다도 큰 덩어리는 입자가 뭉친 것으로 본다
 const CLUMP_FILL = 0.35               // 외곽 사각형을 이 비율도 못 채우면 입자가 이어진 모양이다
