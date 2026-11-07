@@ -32,6 +32,16 @@ function toSeconds(str?: string): number {
   return m[3] ? parseInt(m[3]) : parseInt(m[1]) * 60 + parseInt(m[2] || '0')
 }
 
+/* 예전 가이드의 분쇄도 글에 든 μm(AI 추정값)를 뺀다. 아래 수치와 기준이 달라 두 값이 함께 보이면 헷갈린다 */
+function grindWords(text?: string) {
+  const unit = '(?:μm|µm|㎛|um|미크론|마이크론)'
+  const cleaned = (text ?? '')
+    .replace(new RegExp(`\\s*\\([^)]*${unit}[^)]*\\)`, 'gi'), '')
+    .replace(new RegExp(`\\s*\\d{3,4}(?:\\s*[~\\-–]\\s*\\d{3,4})?\\s*${unit}`, 'gi'), '')
+    .trim()
+  return cleaned || text
+}
+
 /* SVG 꺾은선 그래프 */
 function PourLineChart({ steps }: { steps: number[] }) {
   const W = 354
@@ -297,7 +307,7 @@ export default function ExtractionGuide({ drip, esp, guideRoast, grindEk43 }: { 
 
               {/* 보조 3개 작게 */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 8 }}>
-                <SubCell label="GRIND" value={drip.grind} />
+                <SubCell label="GRIND" value={grindNumbers ? grindWords(drip.grind) : drip.grind} />
                 <SubCell label="RATIO" value={drip.ratio} />
                 <SubCell label="TIME"  value={drip.time} />
               </div>
