@@ -61,6 +61,9 @@ function DistributionChart({ bins, d50 }: { bins: HistogramBin[]; d50: number })
   const logX = (um: number) => (Math.log(um / bins[0].from) / Math.log(bins[bins.length - 1].to / bins[0].from)) * W
   const ticks = [100, 200, 400, 800, 1600]
   const d50X = Math.max(0, Math.min(W, logX(d50)))
+  // 막대가 검은색이라 D50 선은 막대 위에서는 검게, 막대 안에서는 밝게 그린다
+  const d50Bin = bins.find((b) => d50 >= b.from && d50 < b.to)
+  const d50BarTop = d50Bin ? BASE - (d50Bin.percent / max) * (BASE - TOP) : BASE
   return (
     <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="입자 크기 분포 그래프" style={{ width: '100%', display: 'block' }}>
       <line x1={0} x2={W} y1={BASE} y2={BASE} stroke="var(--p-line)" strokeWidth={1} />
@@ -77,13 +80,14 @@ function DistributionChart({ bins, d50 }: { bins: HistogramBin[]; d50: number })
             {height > 0.5 && (
               <path
                 d={`M${x},${BASE} V${y + rad} Q${x},${y} ${x + rad},${y} H${x + width - rad} Q${x + width},${y} ${x + width},${y + rad} V${BASE} Z`}
-                fill="var(--p-accent)" pointerEvents="none"
+                fill="var(--p-ink)" pointerEvents="none"
               />
             )}
           </g>
         )
       })}
-      <line x1={d50X} x2={d50X} y1={TOP - 4} y2={BASE} stroke="var(--p-ink)" strokeWidth={1.5} strokeDasharray="3 3" pointerEvents="none" />
+      <line x1={d50X} x2={d50X} y1={TOP - 4} y2={d50BarTop} stroke="var(--p-ink)" strokeWidth={1.5} strokeDasharray="3 3" pointerEvents="none" />
+      <line x1={d50X} x2={d50X} y1={d50BarTop} y2={BASE} stroke="var(--p-bg)" strokeWidth={1.5} strokeDasharray="3 3" pointerEvents="none" />
       <text x={Math.min(W - 44, d50X + 4)} y={TOP - 6} fontSize={10} fill="var(--p-ink)" fontFamily="Inter, sans-serif">
         D50 {Math.round(d50)}
       </text>
